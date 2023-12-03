@@ -27,7 +27,8 @@ paths:
     get:
       tags:
         - Currency
-      summary: getAllCurrency
+      summary: Get all currency
+      operationId: getAllCurrency
       description: get all currency with pagination
       parameters:
         - $ref: '#/components/parameters/PagePagination'
@@ -35,6 +36,56 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/CurrencyList200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    put:
+      tags:
+        - Currency
+      summary: Save or Udpate currency 
+      operationId: saveOrUpdateCurrency
+      description: Save list of new currency or update if already exist 
+      security:
+        - oauth2: [ admin ]
+      requestBody:
+        required: true
+        description: List of the currency to save or update
+        content:
+          application/json: 
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Currency'
+      responses:
+        200:
+          $ref: '#/components/responses/CurrencyList200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+  /currency/{currencyId}:
+    get:
+      tags:
+        - Currency
+      summary: Get one currency
+      operationId: getOneCurrency
+      description: Get one currency by a given id
+      parameters:
+        - in: path
+          name: currencyId
+          schema:
+            type: string 
+            format: uuid
+          description: Id of the currency to get
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Currency200'
         400:
           $ref: "#/components/responses/400"
         403:
@@ -175,3 +226,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerError'
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://hei.wallet.token.com 
+          scopes:
+            anonyme: User not authentificated
+            admin: User authentificated as admin 
+            user: User authentificated as simple user
