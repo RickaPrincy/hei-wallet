@@ -23,6 +23,34 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    Currency:
+      type: object
+      properrties:
+        id:
+          type: string
+        currency_name:
+          type: string
+        code:
+          $ref: '#/components/schemas/Code'
+        symbole:
+          $ref: '#/components/schemas/Symbole'
+        exchange_rate:
+          type: float
+        updated_at:
+          type: string
+          format: date-time
+    Code:
+      type: string
+      enum:
+        - USD
+        - EUR
+        - MGA
+    Symbole:
+      type: string
+      enum:
+        - $
+        - €
+        - Ar
     ResponseBody:
       type: object
       properties:
