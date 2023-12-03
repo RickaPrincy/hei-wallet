@@ -23,6 +23,77 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
+  /account:
+    get:
+      tags:
+        - Account 
+      summary: Get all account 
+      operationId: getAllAccoutn
+      description: get all account with pagination
+      parameters:
+        - $ref: '#/components/parameters/PagePagination'
+        - $ref: '#/components/parameters/PageSizePagination'
+      security:
+        - oauth2: [ admin ]
+      responses:
+        200:
+          $ref: '#/components/responses/AccountList200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    put:
+      tags:
+        - Account 
+      summary: Save or Udpate account 
+      operationId: saveOrUpdateAccount
+      description: Save list of new account or update if already exist 
+      security:
+        - oauth2: [ admin ]
+      requestBody:
+        required: true
+        description: List of the account to save or update
+        content:
+          application/json: 
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          $ref: '#/components/responses/AccountList200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+  /account/{accountId}:
+    get:
+      tags:
+        - Account 
+      summary: Get one Account
+      operationId: getOneAccount
+      description: Get one account by a given id
+      parameters:
+        - in: path
+          name: accountId 
+          schema:
+            type: string 
+            format: uuid
+          description: Id of the account to get
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Account200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
   /currency:
     get:
       tags:
@@ -109,6 +180,63 @@ components:
         type: integer
         default: 50  
   schemas:
+    AccountBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+        - properties:
+            body:
+              $ref: '#/components/schemas/Account'
+    AccountListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Account'
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        name:
+          type: string
+          example: 'Account Name'
+        type:
+          $ref: '#/components/schemas/AccountType' 
+          example: CHECKING
+        balance:
+          type: number
+          format: float 
+          example: 2000.2
+        number:
+          type: string
+          example: '101-0151'
+        creation_date:
+          type: string
+          format: date
+          example: '2023-01-01'
+        comment: 
+          type: string
+          example: some comments
+        owner: 
+          type: string
+          example: Rabe
+        bank_name:
+          type: string
+          example: BMOI
+        currency:
+          $ref: '#/components/schemas/Currency'
+    AccountType:
+      type: string
+      enum:
+        - CHECKING 
+        - SAVING
+        - BUSINESS
+        - INVESTMENT
+        - CERTIFICATE_OF_DEPOSIT
     CurrencyBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
@@ -190,6 +318,18 @@ components:
           message: INTERNAL SERVER ERROR 
         body: null
   responses:
+    Account200:
+      description: One Account 
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountBody'
+    AccountList200:
+      description: List of account 
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountListBody'
     Currency200:
       description: One currency 
       content:
