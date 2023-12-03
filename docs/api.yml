@@ -14,9 +14,78 @@ paths:
       operationId: ping
       responses:
         200:
-          description: pong
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: pong
+          $ref: '#/components/responses/Ping200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+components:
+  schemas:
+    ResponseBody:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: OK
+    PingBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+      example:
+        status:
+          code: 200 
+          message: pong 
+        body: null 
+    BadRequestBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+      example:
+        status:
+          code: 400
+          message: BAD REQUEST
+        body: null 
+    ForbiddenBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+      example:
+        status:
+          code: 403
+          message: FORBIDDEN
+        body: null 
+    InternalServerError:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+      example:
+        status:
+          code: 500 
+          message: INTERNAL SERVER ERROR 
+        body: null
+  responses:
+    Ping200:
+      description: pong
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PingBody'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestBody'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenBody'
+    500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
