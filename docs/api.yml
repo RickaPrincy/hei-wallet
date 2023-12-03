@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: Hei Wallet API
+  version: 1.0.0
+  description: STD22052 - STD22069
+servers:
+  - url: https://hei.wallet.api.com
+paths:
+  /ping:
+    get:
+      tags:
+        - Security
+      summary: pong
+      operationId: ping
+      responses:
+        200:
+          description: pong
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
