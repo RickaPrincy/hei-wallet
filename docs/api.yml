@@ -25,32 +25,20 @@ components:
   schemas:
     Currency:
       type: object
-      properrties:
+      properties:
         id:
           type: string
-        currency_name:
+        name:
           type: string
         code:
-          $ref: '#/components/schemas/Code'
-        symbole:
-          $ref: '#/components/schemas/Symbole'
+          type: string
+        symbol:
+          type: string
         exchange_rate:
           type: float
         updated_at:
           type: string
-          format: date-time
-    Code:
-      type: string
-      enum:
-        - USD
-        - EUR
-        - MGA
-    Symbole:
-      type: string
-      enum:
-        - $
-        - €
-        - Ar
+          format: date
     ResponseBody:
       type: object
       properties:
