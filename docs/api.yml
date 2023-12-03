@@ -23,6 +23,22 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    Currency:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+        symbol:
+          type: string
+        exchange_rate:
+          type: float
+        updated_at:
+          type: string
+          format: date
     ResponseBody:
       type: object
       properties:
