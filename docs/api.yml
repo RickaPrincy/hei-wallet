@@ -23,6 +23,79 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
+  /transaction:
+    get:
+      tags:
+        - Transaction 
+      summary: Get all transaction
+      operationId: getAllTransaction
+      description: get all transaction with pagination
+      parameters:
+        - $ref: '#/components/parameters/PagePagination'
+        - $ref: '#/components/parameters/PageSizePagination'
+      security:
+        - oauth2: [ admin ]
+      responses:
+        200:
+          $ref: '#/components/responses/TransactionList200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+    put:
+      tags:
+        - Transaction 
+      summary: Save or Udpate transaction
+      operationId: saveOrUpdateTransaction
+      description: Save list of new transaction or update if already exist 
+      security:
+        - oauth2: [ admin ]
+      requestBody:
+        required: true
+        description: List of the transaction to save or update
+        content:
+          application/json: 
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+      responses:
+        200:
+          $ref: '#/components/responses/TransactionList200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
+  /transaction/{transactionId}:
+    get:
+      tags:
+        - Transaction 
+      summary: Get one Transaction 
+      operationId: getOneTransaction
+      description: Get one transaction by a given id
+      parameters:
+        - in: path
+          name: transactionId 
+          schema:
+            type: string 
+            format: uuid
+          description: Id of the transaction to get
+          required: true
+      security:
+        - oauth2: [ admin, user ]
+      responses:
+        200:
+          $ref: '#/components/responses/Transaction200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
   /account:
     get:
       tags:
@@ -85,6 +158,8 @@ paths:
             format: uuid
           description: Id of the account to get
           required: true
+      security:
+        - oauth2: [ admin, user ]
       responses:
         200:
           $ref: '#/components/responses/Account200'
@@ -180,6 +255,46 @@ components:
         type: integer
         default: 50  
   schemas:
+    TransactionBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+        - properties:
+            body:
+              $ref: '#/components/schemas/Transaction'
+    TransactionListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        description:
+          type: string
+          example: 'Some description'
+        amount:
+          type: number
+          format: float 
+          example: 2000.2
+        transaction_datetime:
+          type: string
+          format: date-time
+          example: '2021-01-01 02:01:01'
+        destination_account:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        source_account:
+          type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
     AccountBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
@@ -318,6 +433,18 @@ components:
           message: INTERNAL SERVER ERROR 
         body: null
   responses:
+    Transaction200:
+      description: One Transaction 
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransactionBody'
+    TransactionList200:
+      description: List of transaction 
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransactionListBody'
     Account200:
       description: One Account 
       content:
