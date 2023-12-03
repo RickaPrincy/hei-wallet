@@ -5,11 +5,13 @@ info:
   description: STD22052 - STD22069
 servers:
   - url: https://hei.wallet.api.com
+security:
+  - oauth2: []
 paths:
   /ping:
     get:
       tags:
-        - Security
+        - Api 
       summary: pong
       operationId: ping
       responses:
@@ -21,24 +23,80 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
+  /currency:
+    get:
+      tags:
+        - Currency
+      summary: getAllCurrency
+      description: get all currency with pagination
+      parameters:
+        - $ref: '#/components/parameters/PagePagination'
+        - $ref: '#/components/parameters/PageSizePagination'
+      responses:
+        200:
+          $ref: '#/components/responses/CurrencyList200'
+        400:
+          $ref: "#/components/responses/400"
+        403:
+          $ref: "#/components/responses/403"
+        500:
+          $ref: "#/components/responses/500"
 components:
+  parameters:
+    PagePagination:
+      name: page
+      description: Pagination page which is 1 by default is not specified
+      in: query
+      schema:
+        type: integer
+        default: 1
+    PageSizePagination:
+      name: pageSize
+      description: Pagination pageSize which is 50 by default is not specified
+      in: query
+      schema:
+        type: integer
+        default: 50  
   schemas:
+    CurrencyBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+        - properties:
+            body:
+              $ref: '#/components/schemas/Currency'
+    CurrencyListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBody'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Currency'
     Currency:
       type: object
       properties:
         id:
           type: string
+          format: uuid
+          example: '550e8400-e29b-41d4-a716-446655440000'
         name:
           type: string
+          example: 'Ariary'
         code:
           type: string
+          example: 'MGA'
         symbol:
           type: string
+          example: 'Ar'
         exchange_rate:
-          type: float
+          type: number
+          format: float
+          example: 0.0002
         updated_at:
           type: string
           format: date
+          description: current_date if not specified
+          example: '2023-01-01'
     ResponseBody:
       type: object
       properties:
@@ -81,6 +139,18 @@ components:
           message: INTERNAL SERVER ERROR 
         body: null
   responses:
+    Currency200:
+      description: One currency 
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CurrencyBody'
+    CurrencyList200:
+      description: List of currency 
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CurrencyListBody'
     Ping200:
       description: pong
       content:
