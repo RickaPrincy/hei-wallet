@@ -17,6 +17,7 @@ DB_USERNAME=prog_admin #your postgresql username
     - [create_table_currency.sql](resources/create_table_currency.sql)
     - [create_account_type.sql](resources/create_account_type.sql)
     - [create_table_account.sql](resources/create_table_account.sql)
+    - [create_transaction_type.sql](resources/create_transaction_type.sql)
     - [create_table_transaction.sql](resources/create_table_transaction.sql)
 
 ### Openapi
