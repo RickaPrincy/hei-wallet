@@ -4,39 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public interface BasicRepository <T>{
-    List<T> findAll();
+    List<T> findAll(Map<String, Pair> filters) throws SQLException;
     List<T> saveAll(List<T> toSave);
-    T save(T toSave);
-    T delete(T toDelete);
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    class BasicImplementation<T> implements BasicRepository<T> {
-        private String tableName;
-        private List<String> columns;
-
-        @Override
-        public List<T> findAll() {
-            return null;
-        }
-
-        @Override
-        public List<T> saveAll(List<T> toSave) {
-            return null;
-        }
-
-        @Override
-        public T save(T toSave) {
-            return null;
-        }
-
-        @Override
-        public T delete(T toDelete) {
-            return null;
-        }
-    }
+    T save(T toSave) throws SQLException;
 }

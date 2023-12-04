@@ -14,26 +14,33 @@ public class Query {
     public static String toSqlName(String text){
         return "\"" + text +  "\"";
     }
-    public static String createKeyValue(Map<String, String> values) {
+    public static String addQuote(Pair pair){return pair.isQuote() ? "'" + pair.getWord() + "'" : pair.getWord();}
+    public static String createKeyValue(Map<String, Pair> values) {
         return values.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .map(entry -> entry.getKey() + "=" + addQuote(entry.getValue()))
                 .collect(Collectors.joining(", "));
     }
-    public static ResultSet selectAll(String tableName) throws SQLException {
-        String query = "SELECT * FROM " + toSqlName(tableName) + ";";
+
+    public static ResultSet selectAll(String tableName, Map<String, Pair> filters) throws SQLException {
+        String query = "SELECT * FROM " + toSqlName(tableName);
+        if(filters != null && !filters.isEmpty())
+            query += " WHERE " + createKeyValue(filters);
         return connection.createStatement().executeQuery(query);
     }
 
-    public static String saveOrUpdate(String tableName, Map<String, String> values) throws SQLException {
+    public static String saveOrUpdate(String tableName, Map<String, Pair> values) throws SQLException {
         String query;
+        values = values.entrySet().stream().filter(el->el.getValue().getWord() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         if(values.containsKey("id"))
-            query = "UDPATE " + toSqlName(tableName) + " SET " + createKeyValue(values) + " WHERE \"id\"="+ values.get("id");
+            query = "UPDATE " + toSqlName(tableName) + " SET " + createKeyValue(values) + " WHERE \"id\"="+ addQuote(values.get("id"));
         else{
             String valuesQuery = values.keySet().stream().map(Query::toSqlName).collect(Collectors.joining(","));
-            query = "INSERT INTO (" + toSqlName(tableName) + valuesQuery +
-                    ") VALUES ( " + values.values().stream().map(Query::toSqlName).collect(Collectors.joining(","));
+            query = "INSERT INTO " + toSqlName(tableName) + "(" + valuesQuery +
+                    ") VALUES ( " + values.values().stream()
+                    .map(Query::addQuote)
+                    .collect(Collectors.joining(",")) + ")";
         }
-
         PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
         statement.executeUpdate();
 
@@ -41,16 +48,5 @@ public class Query {
         if(idStatement.next())
             return idStatement.getString(1);
         return null;
-    }
-
-    public static List<String> saveOrUpdateAll(List<String> tableNames, List<Map<String, String>> values) throws SQLException {
-        if(tableNames.size() != values.size()){
-            throw new RuntimeException("Number of tableNames must be same as number of values");
-        }
-        List<String> ids = new ArrayList<>();
-        for(int i = 0; i < tableNames.size(); i++){
-            ids.add(saveOrUpdate(tableNames.get(i), values.get(i)));
-        }
-        return ids;
     }
 }

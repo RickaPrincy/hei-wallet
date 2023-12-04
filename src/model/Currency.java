@@ -9,8 +9,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Currency {
-    private String id, name, symbol;
+    private String id, name,code, symbol;
     private float exchangeRate;
     private Date updatedAt;
-
 }
