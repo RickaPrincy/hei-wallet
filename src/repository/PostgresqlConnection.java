@@ -15,9 +15,9 @@ public class PostgresqlConnection{
             return connection;
         try{
             connection = DriverManager.getConnection(
-                    DB_URL,
-                    DB_USERNAME,
-                    DB_PASSWORD
+                DB_URL,
+                DB_USERNAME,
+                DB_PASSWORD
             );
             return connection;
         }

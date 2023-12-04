@@ -47,7 +47,7 @@ paths:
     put:
       tags:
         - Transaction 
-      summary: Save or Udpate transaction
+      summary: Save or Update transaction
       operationId: saveOrUpdateTransaction
       description: Save list of new transaction or update if already exist 
       security:
@@ -101,7 +101,7 @@ paths:
       tags:
         - Account 
       summary: Get all account 
-      operationId: getAllAccoutn
+      operationId: getAllAccount
       description: get all account with pagination
       parameters:
         - $ref: '#/components/parameters/PagePagination'
@@ -120,7 +120,7 @@ paths:
     put:
       tags:
         - Account 
-      summary: Save or Udpate account 
+      summary: Save or Update account
       operationId: saveOrUpdateAccount
       description: Save list of new account or update if already exist 
       security:
@@ -191,7 +191,7 @@ paths:
     put:
       tags:
         - Currency
-      summary: Save or Udpate currency 
+      summary: Save or Update currency
       operationId: saveOrUpdateCurrency
       description: Save list of new currency or update if already exist 
       security:
@@ -269,6 +269,12 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Transaction'
+    TransactionType:
+      type: string
+      enum:
+        - WITHDRAWAL
+        - DEPOSIT
+        - TRANSFER
     Transaction:
       type: object
       properties:
@@ -276,6 +282,11 @@ components:
           type: string
           format: uuid
           example: '550e8400-e29b-41d4-a716-446655440000'
+        ref:
+          type: string
+          example: '1201-244'
+        type:
+          $ref: '#/components/schemas/TransactionType'
         description:
           type: string
           example: 'Some description'
@@ -321,7 +332,6 @@ components:
           example: 'Account Name'
         type:
           $ref: '#/components/schemas/AccountType' 
-          example: CHECKING
         balance:
           type: number
           format: float 
