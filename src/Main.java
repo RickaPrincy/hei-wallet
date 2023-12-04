@@ -1,16 +1,13 @@
-import model.Account;
-import model.AccountType;
-import model.Currency;
+import model.*;
 import repository.AccountRepository;
 import repository.CurrencyRepository;
 import repository.Pair;
-import repository.PostgresqlConnection;
+import repository.TransactionRepository;
 
-import javax.accessibility.AccessibleComponent;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +15,7 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         AccountRepository accountRepository = new AccountRepository();
         CurrencyRepository currencyRepository = new CurrencyRepository();
+        TransactionRepository transactionRepository= new TransactionRepository();
         Currency insertedCurrency = new Currency("currency_dollar", "name_inserted", "code_inserted", null, 100, Date.valueOf("2023-01-01"));
 
         //filter by id test
@@ -36,20 +34,28 @@ public class Main {
 
         //insert account
         Account insertAccount = new Account(
-            null,
+            "account_id1",
             "nametest",
             "test",
             "test",
             "test",
-            "test",
+            "tttt5t",
             Date.valueOf("2023-01-01"),
             BigDecimal.valueOf(5),
             AccountType.BUSINESS,
             insertedCurrency
         );
-        accountRepository.save(insertAccount);
+        System.out.println(accountRepository.save(insertAccount));
 
         //findAllAccount
         accountRepository.findAll(null).forEach(System.out::println);
+
+        //create transaction
+        System.out.println(transactionRepository.saveAll(List.of(
+                new Transaction(null, "test", BigDecimal.valueOf(555), insertAccount, null, Timestamp.valueOf("2023-01-01 01:01:01"), TransactionType.DEPOSIT)
+        )));
+
+        //findAllAccount
+        transactionRepository.findAll(null).forEach(System.out::println);
     }
 }
