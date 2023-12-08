@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Query {
+    public final static String ID_LABEL = "id";
     private final static Connection connection = PostgresqlConnection.getConnection();
     public static String toSqlName(String text){
         return "\"" + text +  "\"";

@@ -1,7 +1,6 @@
 package repository;
 
-import lombok.AllArgsConstructor;
-import model.Currency;
+import lombok.AllArgsConstructor; import model.Currency;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,21 +10,22 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class CurrencyRepository implements BasicRepository<Currency>{
+    public final static String NAME_LABEL = "name";
+    public final static String CODE_LABEL = "code";
+    public final static String TABLE_NAME = "currency";
+
     private static Currency createInstance(ResultSet resultSet) throws SQLException {
         return new Currency(
-            resultSet.getString("id"),
-            resultSet.getString("name"),
-            resultSet.getString("code"),
-            resultSet.getString("symbol"),
-            resultSet.getFloat("exchange_rate"),
-            resultSet.getDate("updated_at")
+            resultSet.getString(Query.ID_LABEL),
+            resultSet.getString(NAME_LABEL),
+            resultSet.getString(CODE_LABEL)
         );
     }
 
     @Override
     public List<Currency> findAll(Map<String, Pair> filters) throws SQLException {
         List<Currency> results = new ArrayList<>();
-        ResultSet resultSet = Query.selectAll("currency", filters);
+        ResultSet resultSet = Query.selectAll(TABLE_NAME, filters);
         while(resultSet.next()){
             results.add(createInstance(resultSet));
         }
@@ -48,15 +48,12 @@ public class CurrencyRepository implements BasicRepository<Currency>{
     @Override
     public Currency save(Currency toSave) throws SQLException {
         Map<String,Pair> values = Map.of(
-            "id", new Pair(toSave.getId(), true),
-            "name", new Pair(toSave.getName(), true),
-            "code", new Pair(toSave.getCode(),true),
-            "symbol", new Pair(toSave.getSymbol(), true),
-            "exchange_rate", new Pair(String.valueOf(toSave.getExchangeRate()), false),
-            "updated_at", new Pair(toSave.getUpdatedAt().toString(), true)
+            Query.ID_LABEL, new Pair(toSave.getId(), true),
+            NAME_LABEL, new Pair(toSave.getName(), true),
+            CODE_LABEL, new Pair(toSave.getCode(),true)
         );
 
-        String id = Query.saveOrUpdate("currency", values);
+        String id = Query.saveOrUpdate(TABLE_NAME, values);
 
         if(id != null)
             toSave.setId(id);
