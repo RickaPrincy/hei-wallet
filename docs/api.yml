@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Hei Wallet API
-  version: 1.0.0
+  version: 2.0.0
   description: STD22052 - STD22069
 servers:
   - url: https://hei.wallet.api.com
@@ -11,7 +11,7 @@ paths:
   /ping:
     get:
       tags:
-        - Api
+        - Api 
       summary: pong
       operationId: ping
       responses:
@@ -23,13 +23,13 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
-  /transaction:
+  /transactions:
     get:
       tags:
-        - Transaction
-      summary: Get all transaction
-      operationId: getAllTransaction
-      description: get all transaction with pagination
+        - Transactions
+      summary: Get all transactions
+      operationId: getAllTransactions
+      description: get all transactions with pagination
       parameters:
         - $ref: '#/components/parameters/PagePagination'
         - $ref: '#/components/parameters/PageSizePagination'
@@ -46,17 +46,17 @@ paths:
           $ref: "#/components/responses/500"
     put:
       tags:
-        - Transaction
-      summary: Save or Udpate transaction
+        - Transactions
+      summary: Save or Update transactions
       operationId: saveOrUpdateTransaction
-      description: Save list of new transaction or update if already exist
+      description: Save list of new transaction or update if already exist 
       security:
         - oauth2: [ admin ]
       requestBody:
         required: true
         description: List of the transaction to save or update
         content:
-          application/json:
+          application/json: 
             schema:
               type: array
               items:
@@ -70,18 +70,18 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
-  /transaction/{transactionId}:
+  /transactions/{transactionId}:
     get:
       tags:
-        - Transaction
-      summary: Get one Transaction
+        - Transactions
+      summary: Get one Transaction 
       operationId: getOneTransaction
       description: Get one transaction by a given id
       parameters:
         - in: path
-          name: transactionId
+          name: transactionId 
           schema:
-            type: string
+            type: string 
             format: uuid
           description: Id of the transaction to get
           required: true
@@ -96,13 +96,13 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
-  /account:
+  /accounts:
     get:
       tags:
-        - Account
-      summary: Get all account
-      operationId: getAllAccoutn
-      description: get all account with pagination
+        - Accounts 
+      summary: Get all accounts
+      operationId: getAllAccounts
+      description: get all accounts with pagination
       parameters:
         - $ref: '#/components/parameters/PagePagination'
         - $ref: '#/components/parameters/PageSizePagination'
@@ -119,21 +119,21 @@ paths:
           $ref: "#/components/responses/500"
     put:
       tags:
-        - Account
-      summary: Save or Udpate account
-      operationId: saveOrUpdateAccount
-      description: Save list of new account or update if already exist
+        - Accounts
+      summary: Save or Update accounts
+      operationId: saveOrUpdateAccounts
+      description: Save list of new account or update if already exist 
       security:
         - oauth2: [ admin ]
       requestBody:
         required: true
-        description: List of the account to save or update
+        description: List of the accounts to save or update
         content:
-          application/json:
+          application/json: 
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/Account'
+                $ref: '#/components/schemas/CreateAccount'
       responses:
         200:
           $ref: '#/components/responses/AccountList200'
@@ -143,18 +143,18 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
-  /account/{accountId}:
+  /accounts/{accountId}:
     get:
       tags:
-        - Account
+        - Accounts
       summary: Get one Account
       operationId: getOneAccount
       description: Get one account by a given id
       parameters:
         - in: path
-          name: accountId
+          name: accountId 
           schema:
-            type: string
+            type: string 
             format: uuid
           description: Id of the account to get
           required: true
@@ -169,13 +169,13 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
-  /currency:
+  /currencies:
     get:
       tags:
-        - Currency
-      summary: Get all currency
-      operationId: getAllCurrency
-      description: get all currency with pagination
+        - Currencies
+      summary: Get all currencies
+      operationId: getAllCurrencies
+      description: get all currencies with pagination
       parameters:
         - $ref: '#/components/parameters/PagePagination'
         - $ref: '#/components/parameters/PageSizePagination'
@@ -190,17 +190,17 @@ paths:
           $ref: "#/components/responses/500"
     put:
       tags:
-        - Currency
-      summary: Save or Udpate currency
-      operationId: saveOrUpdateCurrency
-      description: Save list of new currency or update if already exist
+        - Currencies
+      summary: Save or Update currencies
+      operationId: saveOrUpdateCurrencies
+      description: Save list of new currency or update if already exist 
       security:
         - oauth2: [ admin ]
       requestBody:
         required: true
         description: List of the currency to save or update
         content:
-          application/json:
+          application/json: 
             schema:
               type: array
               items:
@@ -214,10 +214,10 @@ paths:
           $ref: "#/components/responses/403"
         500:
           $ref: "#/components/responses/500"
-  /currency/{currencyId}:
+  /currencies/{currencyId}:
     get:
       tags:
-        - Currency
+        - Currencies
       summary: Get one currency
       operationId: getOneCurrency
       description: Get one currency by a given id
@@ -225,7 +225,7 @@ paths:
         - in: path
           name: currencyId
           schema:
-            type: string
+            type: string 
             format: uuid
           description: Id of the currency to get
           required: true
@@ -253,7 +253,7 @@ components:
       in: query
       schema:
         type: integer
-        default: 50
+        default: 50  
   schemas:
     TransactionBody:
       allOf:
@@ -269,6 +269,11 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Transaction'
+    TransactionType:
+      type: string
+      enum:
+        - DEBIT 
+        - CREDIT 
     Transaction:
       type: object
       properties:
@@ -278,18 +283,17 @@ components:
           example: '550e8400-e29b-41d4-a716-446655440000'
         label:
           type: string
-          example: 'prêt bancaire'
+          example: 'Some label'
+        type:
+          $ref: '#/components/schemas/TransactionType'
         amount:
           type: number
-          format: float
+          format: fouble 
           example: 2000.2
         transaction_datetime:
           type: string
           format: date-time
           example: '2021-01-01 02:01:01'
-        type:
-          type: string
-          example: 'debit'  # or 'credit'
     AccountBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
@@ -304,7 +308,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Account'
-    Account:
+    CreateAccount:
       type: object
       properties:
         id:
@@ -315,30 +319,25 @@ components:
           type: string
           example: 'Account Name'
         type:
-          $ref: '#/components/schemas/AccountType'
+          $ref: '#/components/schemas/AccountType' 
         balance:
           type: number
-          format: float
+          format: double 
           example: 2000.2
-        creation_date:
+        currency: 
           type: string
-          format: date
-          example: '2023-01-01'
-        comment:
-          type: string
-          example: some comments
-        owner:
-          type: string
-          example: Rabe
-        bank_name:
-          type: string
-          example: BMOI
-        currency:
-          $ref: '#/components/schemas/Currency'
+          example: '550e8400-e29b-41d4-a716-446655440000'
+    Account:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateAccount'
+      properties:
         transactions:
           type: array
           items:
             $ref: '#/components/schemas/Transaction'
+        currency:
+          $ref: '#/components/schemas/Currency'
     AccountType:
       type: string
       enum:
@@ -375,20 +374,23 @@ components:
     ResponseBody:
       type: object
       properties:
-        code:
-          type: integer
-          example: 200
-        message:
-          type: string
-          example: OK
+        status:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: OK
     PingBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
       example:
         status:
-          code: 200
-          message: pong
-        body: null
+          code: 200 
+          message: pong 
+        body: null 
     BadRequestBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
@@ -396,7 +398,7 @@ components:
         status:
           code: 400
           message: BAD REQUEST
-        body: null
+        body: null 
     ForbiddenBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
@@ -404,48 +406,48 @@ components:
         status:
           code: 403
           message: FORBIDDEN
-        body: null
+        body: null 
     InternalServerError:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
       example:
         status:
-          code: 500
-          message: INTERNAL SERVER ERROR
+          code: 500 
+          message: INTERNAL SERVER ERROR 
         body: null
   responses:
     Transaction200:
-      description: One Transaction
+      description: One Transaction 
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/TransactionBody'
     TransactionList200:
-      description: List of transaction
+      description: List of transaction 
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/TransactionListBody'
     Account200:
-      description: One Account
+      description: One Account 
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/AccountBody'
     AccountList200:
-      description: List of account
+      description: List of account 
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/AccountListBody'
     Currency200:
-      description: One currency
+      description: One currency 
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/CurrencyBody'
     CurrencyList200:
-      description: List of currency
+      description: List of currency 
       content:
         application/json:
           schema:
@@ -479,8 +481,8 @@ components:
       type: oauth2
       flows:
         implicit:
-          authorizationUrl: https://hei.wallet.token.com
+          authorizationUrl: https://hei.wallet.token.com 
           scopes:
             anonyme: User not authentificated
-            admin: User authentificated as admin
-            user: User authentificated as a simple user
+            admin: User authentificated as admin 
+            user: User authentificated as simple user
