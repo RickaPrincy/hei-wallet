@@ -13,48 +13,21 @@ public class Main {
         CurrencyRepository currencyRepository = new CurrencyRepository();
         TransactionRepository transactionRepository = new TransactionRepository();
         BalanceRepository balanceRepository = new BalanceRepository();
-        AccountRepository accountRepository= new AccountRepository();
+        AccountRepository accountRepository = new AccountRepository();
+
 /*
-        Currency insertedCurrency = new Currency("currency_dollar", "name_inserted", "code_inserted");
-*/
-
-        //filter by id test
-/*
-        currencyRepository
-                .findAll(Map.of(Query.ID_LABEL, new Pair("currency_ariary",true)))
-                .forEach(System.out::println);
-*/
-
-        //saveAll and save (save or update)
-/*
-        currencyRepository.saveAll(List.of(
-            insertedCurrency,
-            new Currency("currency_ariary", "name_inserted", "code_inserted")
-        ));
-*/
-        Currency insertedCurrency = new Currency("currency_euro", "name_inserted", "code_inserted");
-        Account insertAccount = new Account(
-            null,
-            "nametest",
-            AccountType.BANK,
-            insertedCurrency,
-            new Balance(null, null, null),
-            null
-        );
-
-        System.out.println(accountRepository.save(insertAccount, null));
-
-
-        //findALlWith no filter
         currencyRepository.findAll(null).forEach(System.out::println);
         balanceRepository.findAll(null).forEach(System.out::println);
         transactionRepository.findAll(null).forEach(System.out::println);
-/*
         accountRepository.findAll(null).forEach(System.out::println);
 */
-/*
-        AccountRepository accountRepository = new AccountRepository();
-        accountRepository.findAll(null).forEach(System.out::println);
-*/
+
+        System.out.println(accountRepository.doTransaction(new Transaction(
+            null,
+            "first transaction",
+            BigDecimal.valueOf(1000),
+            null,
+            TransactionType.DEBIT
+        ), "account_id1"));
     }
 }

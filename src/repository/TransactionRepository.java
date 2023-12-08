@@ -6,6 +6,7 @@ import model.TransactionType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +56,11 @@ public class TransactionRepository implements BasicRepository<Transaction>{
 
     @Override
     public Transaction save(Transaction toSave, String idAccount) throws SQLException {
+        LocalDateTime datetime = toSave.getTransactionDatetime();
         Map<String,Pair> values = Map.of(
             Query.ID_LABEL, new Pair(toSave.getId(), true),
             LBL_LABEL, new Pair(toSave.getLabel(), true),
-            DATETIME_LABEL, new Pair(toSave.getTransactionDatetime().toString(), true),
+            DATETIME_LABEL, new Pair( datetime != null ?  datetime.toString() : null, true),
             TYPE_LABEL,new Pair(toSave.getType().toString(),true),
             ACCOUNT_LABEL, new Pair(idAccount, true),
             AMOUNT_LABEL, new Pair(toSave.getAmount().toString(), false)

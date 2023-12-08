@@ -1,10 +1,7 @@
 package repository;
 
 import lombok.AllArgsConstructor;
-import model.Account;
-import model.AccountType;
-import model.Balance;
-import model.Currency;
+import model.*;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -37,7 +34,7 @@ public class AccountRepository implements BasicRepository<Account>{
             resultSet.getString(NAME_LABEL),
             AccountType.valueOf(resultSet.getString(TYPE_LABEL)),
             currencyRepository.findAll(currencyFilter).get(0),
-            balanceList.size() > 0 ? balanceList.get(0) : new Balance("-", BigDecimal.valueOf(0), LocalDateTime.now()),
+            !balanceList.isEmpty() ? balanceList.get(0) : new Balance("-", BigDecimal.valueOf(0), LocalDateTime.now()),
             transactionRepository.findAll(transactionFilter)
         );
     }
@@ -78,5 +75,41 @@ public class AccountRepository implements BasicRepository<Account>{
         if(id != null)
             toSave.setId(id);
         return toSave;
+    }
+
+    public Account doTransaction(Transaction transaction, String accountId) throws SQLException {
+        if(accountId != null){
+            Map<String, Pair> accountFilter = Map.of(Query.ID_LABEL, new Pair(accountId, true));
+            List<Account> accounts = findAll(accountFilter);
+            if(accounts.isEmpty())
+                return null;
+
+            Account target = accounts.get(0);
+            if(
+                target.getType() != AccountType.BANK &&
+                transaction.getType() == TransactionType.DEBIT &&
+                target.getBalance().getAmount().compareTo(transaction.getAmount()) < 0
+            ){
+                return target;
+            }
+
+            //remove generated value
+            transaction.setTransactionDatetime(null);
+            transaction.setId(null);
+
+            //persist new transaction
+            transactionRepository.save(transaction, target.getId());
+
+            //persist new balance
+            BigDecimal amountToAdd = transaction.getType() == TransactionType.CREDIT ? transaction.getAmount() : transaction.getAmount().negate();
+            BigDecimal newBalance = target.getBalance().getAmount().add(amountToAdd);
+            balanceRepository.save(new Balance(
+                null,
+                newBalance,
+                null
+            ), target.getId());
+            return findAll(accountFilter).get(0);
+        }
+        return null;
     }
 }

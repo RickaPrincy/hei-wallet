@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor; import model.Balance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +50,11 @@ public class BalanceRepository implements BasicRepository<Balance>{
 
     @Override
     public Balance save(Balance toSave, String idAccount) throws SQLException {
+        LocalDateTime dateTime = toSave.getCreationDatetime();
         Map<String,Pair> values = Map.of(
             Query.ID_LABEL, new Pair(toSave.getId(), true),
             AMOUNT_LABEL, new Pair(toSave.getAmount().toString(), false),
-            CREATION_DATETIME, new Pair(toSave.getCreationDatetime().toString(),true),
+            CREATION_DATETIME, new Pair(dateTime != null ? dateTime.toString() : null,true),
             ACCOUNT_LABEL, new Pair(idAccount,true)
         );
 

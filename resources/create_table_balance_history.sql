@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "balance_history" (
     "id" VARCHAR(255) PRIMARY KEY DEFAULT uuid_generate_v4(),
     "balance" DECIMAL(18,5) NOT NULL,
-    "creation_datetime" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "creation_datetime" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "account" VARCHAR(255) REFERENCES "account"("id") NOT NULL
 );
 
