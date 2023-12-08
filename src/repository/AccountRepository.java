@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import model.*;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class AccountRepository implements BasicRepository<Account>{
+    private final Connection connection = PostgresqlConnection.getConnection();
     private final static String
         TABLE_NAME ="account",
         NAME_LABEL="name",
@@ -111,5 +111,23 @@ public class AccountRepository implements BasicRepository<Account>{
             return findAll(accountFilter).get(0);
         }
         return null;
+    }
+
+    public List<Balance> getBalance(String accountId, LocalDateTime from, LocalDateTime to) throws SQLException {
+        Map<String, Pair> accountFilter = Map.of(Query.ID_LABEL, new Pair(accountId, true));
+        List<Account> accounts = findAll(accountFilter);
+        if(accounts.isEmpty())
+            return new ArrayList<>();
+        String query = "SELECT * FROM \"" + BalanceRepository.TABLE_NAME + "\" WHERE \"" + BalanceRepository.ACCOUNT_LABEL + "\" = ? AND \"" + BalanceRepository.CREATION_DATETIME + "\" BETWEEN ? AND ? ";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, accountId);
+        statement.setTimestamp(2, Timestamp.valueOf(from));
+        statement.setTimestamp(3, Timestamp.valueOf(to));
+        ResultSet resultSet = statement.executeQuery();
+        List<Balance> balances = new ArrayList<>();
+        while(resultSet.next()){
+            balances.add(BalanceRepository.createInstance(resultSet));
+        }
+        return balances;
     }
 }
