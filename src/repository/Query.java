@@ -1,52 +1,42 @@
 package repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Query {
-    private final static Connection connection = PostgresqlConnection.getConnection();
+    public final static String ID_LABEL = "id";
     public static String toSqlName(String text){
         return "\"" + text +  "\"";
     }
-    public static String addQuote(Pair pair){return pair.isQuote() ? "'" + pair.getWord() + "'" : pair.getWord();}
-    public static String createKeyValue(Map<String, Pair> values) {
-        return values.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + addQuote(entry.getValue()))
-                .collect(Collectors.joining(", "));
+    public static String mapKeys(List<String> keys, String separator, String suffix) {
+        return keys.stream().map(el -> toSqlName(el) + suffix).collect(Collectors.joining(separator));
+    }
+    public static String transaction(List<String> queries){
+        return "BEGIN;\n" + String.join("\n", queries) + "\nCOMMIT;";
     }
 
-    public static ResultSet selectAll(String tableName, Map<String, Pair> filters) throws SQLException {
+    public static String selectAll(String tableName, List<String> filters, String suffix){
         String query = "SELECT * FROM " + toSqlName(tableName);
         if(filters != null && !filters.isEmpty())
-            query += " WHERE " + createKeyValue(filters);
-        return connection.createStatement().executeQuery(query);
+            query += " WHERE " + mapKeys(filters, " AND ", "=?");
+        if(suffix != null){
+            query += suffix;
+        }
+        return query + " ;";
     }
 
-    public static String saveOrUpdate(String tableName, Map<String, Pair> values) throws SQLException {
+    public static String saveOrUpdate(String tableName, List<String> columns){
         String query;
-        values = values.entrySet().stream().filter(el->el.getValue().getWord() != null)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        if(values.containsKey("id"))
-            query = "UPDATE " + toSqlName(tableName) + " SET " + createKeyValue(values) + " WHERE \"id\"="+ addQuote(values.get("id"));
-        else{
-            String valuesQuery = values.keySet().stream().map(Query::toSqlName).collect(Collectors.joining(","));
-            query = "INSERT INTO " + toSqlName(tableName) + "(" + valuesQuery +
-                    ") VALUES ( " + values.values().stream()
-                    .map(Query::addQuote)
-                    .collect(Collectors.joining(",")) + ")";
+        if(columns.contains(Query.ID_LABEL)){
+            List<String> withoutId = columns.stream().filter(el -> !el.equals(ID_LABEL)).collect(Collectors.toList());
+            query = "UPDATE " + toSqlName(tableName) + " SET " +
+                    mapKeys(withoutId, " , ", "=?") +
+                    " WHERE " + toSqlName(ID_LABEL) + " =?";
+        }else{
+            query = "INSERT INTO " + toSqlName(tableName) +  "("  +
+                mapKeys(columns, ",", "") + ") VALUES ( ?" +
+                " ,?".repeat(columns.size() - 1) + " )";
         }
-        PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
-        statement.executeUpdate();
-
-        ResultSet idStatement = statement.getGeneratedKeys();
-        if(idStatement.next())
-            return idStatement.getString(1);
-        return null;
+        return query + " ;";
     }
 }

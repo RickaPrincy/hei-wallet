@@ -22,8 +22,7 @@ public class PostgresqlConnection{
             return connection;
         }
         catch (SQLException error){
-            System.out.println(error.getMessage());
-            throw new RuntimeException("Connection failed");
+            throw new RuntimeException(error.getMessage());
         }
     }
 
@@ -31,6 +30,7 @@ public class PostgresqlConnection{
         if(connection != null){
             try {
                 connection.close();
+                connection = null;
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }

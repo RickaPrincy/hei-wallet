@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface BasicRepository <T>{
-    List<T> findAll(Map<String, Pair> filters) throws SQLException;
-    List<T> saveAll(List<T> toSave);
-    T save(T toSave) throws SQLException;
+    List<T> findAll(Map<String, Object> filters, String suffix) throws SQLException;
+    List<T> saveAll(List<T> toSave, String meta);
+    T save(T toSave, String meta) throws SQLException;
 }

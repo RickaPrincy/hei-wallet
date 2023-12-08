@@ -5,61 +5,65 @@ import model.Currency;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @AllArgsConstructor
 public class CurrencyRepository implements BasicRepository<Currency>{
-    private static Currency createInstance(ResultSet resultSet) throws SQLException {
-        return new Currency(
-            resultSet.getString("id"),
-            resultSet.getString("name"),
-            resultSet.getString("code"),
-            resultSet.getString("symbol"),
-            resultSet.getFloat("exchange_rate"),
-            resultSet.getDate("updated_at")
-        );
-    }
+    public final static String
+        NAME_LABEL = "name",
+        CODE_LABEL = "code",
+        TABLE_NAME = "currency";
 
-    @Override
-    public List<Currency> findAll(Map<String, Pair> filters) throws SQLException {
-        List<Currency> results = new ArrayList<>();
-        ResultSet resultSet = Query.selectAll("currency", filters);
-        while(resultSet.next()){
-            results.add(createInstance(resultSet));
+    private static Currency createInstance(ResultSet resultSet){
+        try {
+            return new Currency(
+                resultSet.getString(Query.ID_LABEL),
+                resultSet.getString(NAME_LABEL),
+                resultSet.getString(CODE_LABEL)
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
         }
-        return results;
     }
 
     @Override
-    public List<Currency> saveAll(List<Currency> toSave) {
+    public List<Currency> findAll(Map<String, Object> filters,String suffix) throws SQLException {
+        return StatementWrapper.selectAll(TABLE_NAME, filters, suffix, CurrencyRepository::createInstance);
+    }
+
+    @Override
+    public List<Currency> saveAll(List<Currency> toSave, String meta) {
         List<Currency> result = new ArrayList<>();
-        toSave.forEach(el-> {
+        toSave.forEach(el -> {
             try {
-                result.add(save(el));
+                result.add(save(el, null));
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                throw new RuntimeException(e.getMessage());
             }
         });
+
         return result;
     }
 
     @Override
-    public Currency save(Currency toSave) throws SQLException {
-        Map<String,Pair> values = Map.of(
-            "id", new Pair(toSave.getId(), true),
-            "name", new Pair(toSave.getName(), true),
-            "code", new Pair(toSave.getCode(),true),
-            "symbol", new Pair(toSave.getSymbol(), true),
-            "exchange_rate", new Pair(String.valueOf(toSave.getExchangeRate()), false),
-            "updated_at", new Pair(toSave.getUpdatedAt().toString(), true)
-        );
+    public Currency save(Currency toSave, String meta) throws SQLException {
+        Map<String, Object> valuesKeys = new LinkedHashMap<>(Map.of(
+            NAME_LABEL, toSave.getName(),
+            CODE_LABEL, toSave.getCode()
+        ));
 
-        String id = Query.saveOrUpdate("currency", values);
+        if(toSave.getId() != null)
+            valuesKeys.put(Query.ID_LABEL, toSave.getId());
 
-        if(id != null)
-            toSave.setId(id);
+        StatementWrapper.saveOrUpdate(TABLE_NAME, valuesKeys, resultSet -> {
+            try {
+                if(resultSet.next()){
+                    toSave.setId(resultSet.getString(1));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
         return toSave;
     }
 }
