@@ -32,7 +32,11 @@ public class Main {
             TransactionType.DEBIT
         ), "account_id1"));
 */
+/*
     accountRepository.getBalance("account_id1",  LocalDateTime.of(2023,01,01,01,1,1), LocalDateTime.now())
         .forEach(System.out::println);
     }
-}
+*/
+            System.out.println(accountRepository.getBalanceInDate("account_id1", LocalDateTime.now()));
+        }
+    }

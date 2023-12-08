@@ -130,4 +130,17 @@ public class AccountRepository implements BasicRepository<Account>{
         }
         return balances;
     }
+
+    public Balance getBalanceInDate(String accountId, LocalDateTime date) throws SQLException {
+        Map<String, Pair> accountFilter = Map.of(Query.ID_LABEL, new Pair(accountId, true));
+        List<Account> accounts = findAll(accountFilter);
+        if(accounts.isEmpty())
+            return null;
+        String query = "SELECT * FROM \"" + BalanceRepository.TABLE_NAME + "\" WHERE \"" + Query.ID_LABEL + "\"= ? AND \"" + BalanceRepository.CREATION_DATETIME + "\" <= ? ORDER BY \"" + BalanceRepository.CREATION_DATETIME; PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, accountId);
+        statement.setTimestamp(2, Timestamp.valueOf(date));
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.next();
+        return BalanceRepository.createInstance(resultSet);
+    }
 }
