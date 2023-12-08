@@ -22,10 +22,13 @@ public class Query {
                 .collect(Collectors.joining(", "));
     }
 
-    public static ResultSet selectAll(String tableName, Map<String, Pair> filters) throws SQLException {
+    public static ResultSet selectAll(String tableName, Map<String, Pair> filters, String suffixSQL) throws SQLException {
         String query = "SELECT * FROM " + toSqlName(tableName);
         if(filters != null && !filters.isEmpty())
             query += " WHERE " + createKeyValue(filters);
+        if(suffixSQL != null){
+            query += suffixSQL;
+        }
         return connection.createStatement().executeQuery(query);
     }
 

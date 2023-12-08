@@ -25,7 +25,7 @@ public class CurrencyRepository implements BasicRepository<Currency>{
     @Override
     public List<Currency> findAll(Map<String, Pair> filters) throws SQLException {
         List<Currency> results = new ArrayList<>();
-        ResultSet resultSet = Query.selectAll(TABLE_NAME, filters);
+        ResultSet resultSet = Query.selectAll(TABLE_NAME, filters, null);
         while(resultSet.next()){
             results.add(createInstance(resultSet));
         }
@@ -33,11 +33,11 @@ public class CurrencyRepository implements BasicRepository<Currency>{
     }
 
     @Override
-    public List<Currency> saveAll(List<Currency> toSave) {
+    public List<Currency> saveAll(List<Currency> toSave, String meta) {
         List<Currency> result = new ArrayList<>();
         toSave.forEach(el-> {
             try {
-                result.add(save(el));
+                result.add(save(el, meta));
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
@@ -46,7 +46,7 @@ public class CurrencyRepository implements BasicRepository<Currency>{
     }
 
     @Override
-    public Currency save(Currency toSave) throws SQLException {
+    public Currency save(Currency toSave, String meta) throws SQLException {
         Map<String,Pair> values = Map.of(
             Query.ID_LABEL, new Pair(toSave.getId(), true),
             NAME_LABEL, new Pair(toSave.getName(), true),

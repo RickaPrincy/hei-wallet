@@ -14,45 +14,42 @@ import java.util.Map;
 @AllArgsConstructor
 public class AccountRepository implements BasicRepository<Account>{
     private final static String
-        NAME_LABEL = "name",
-        TYPE_LABEL= "type",
-        DATETIME_LABEL= "transaction_datetime",
-        CURRENCY_LABEL= "currency";
+        TABLE_NAME ="account",
+        NAME_LABEL="name",
+        TYPE_LABEL="type",
+        CURRENCY_LABEL="currency";
+
+    final private static BalanceRepository balanceRepository = new BalanceRepository();
+    final private static TransactionRepository transactionRepository = new TransactionRepository();
     final private static CurrencyRepository currencyRepository = new CurrencyRepository();
+
     private static Account createInstance(ResultSet resultSet) throws SQLException {
-/*
+        Map<String, Pair> balanceFilter = Map.of(BalanceRepository.ACCOUNT_LABEL, new Pair(resultSet.getString(Query.ID_LABEL), true));
+        Map<String, Pair> transactionFilter = Map.of(TransactionRepository.ACCOUNT_LABEL, new Pair(resultSet.getString(Query.ID_LABEL), true));
         Map<String, Pair> currencyFilter = Map.of(Query.ID_LABEL, new Pair(resultSet.getString(CURRENCY_LABEL), true));
+
         return new Account(
             resultSet.getString(Query.ID_LABEL),
             resultSet.getString(NAME_LABEL),
-            resultSet.getString(),
-            resultSet.getString("owner"),
-            resultSet.getString("bank_name"),
-            resultSet.getString("number"),
-            resultSet.getDate("creation_date"),
-            resultSet.getBigDecimal("balance"),
-            AccountType.valueOf(resultSet.getString("type")),
-            currencyRepository.findAll(currencyFilter).get(0)
+            AccountType.valueOf(resultSet.getString(TYPE_LABEL)),
+            currencyRepository.findAll(currencyFilter).get(0),
+            balanceRepository.findAll(balanceFilter).get(0),
+            transactionRepository.findAll(transactionFilter)
         );
-*/
-        return null;
     }
 
     @Override
     public List<Account> findAll(Map<String, Pair> filters) throws SQLException {
-/*
         List<Account> results = new ArrayList<>();
-        ResultSet resultSet = Query.selectAll("account", filters);
+        ResultSet resultSet = Query.selectAll(TABLE_NAME, filters, null);
         while(resultSet.next()){
             results.add(createInstance(resultSet));
         }
         return results;
-*/
-        return null;
     }
 
     @Override
-    public List<Account> saveAll(List<Account> toSave) {
+    public List<Account> saveAll(List<Account> toSave, String meta) {
 /*
         List<Account> result = new ArrayList<>();
         toSave.forEach(el-> {
@@ -68,7 +65,7 @@ public class AccountRepository implements BasicRepository<Account>{
     }
 
     @Override
-    public Account save(Account toSave) throws SQLException {
+    public Account save(Account toSave, String meta) throws SQLException {
 /*
         Map<String,Pair> values = Map.of(
             "id", new Pair(toSave.getId(), true),

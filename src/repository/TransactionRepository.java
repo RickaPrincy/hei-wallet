@@ -1,7 +1,6 @@
 package repository;
 
 import lombok.AllArgsConstructor;
-import model.Account;
 import model.Transaction;
 import model.TransactionType;
 
@@ -13,7 +12,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class TransactionRepository implements BasicRepository<Transaction>{
-    private final static String
+    public final static String
         LBL_LABEL = "label",
         AMOUNT_LABEL= "amount",
         DATETIME_LABEL= "transaction_datetime",
@@ -22,23 +21,19 @@ public class TransactionRepository implements BasicRepository<Transaction>{
         TABLE_NAME="transaction";
     private final static AccountRepository accountRepository = new AccountRepository();
     private static Transaction createInstance(ResultSet resultSet) throws SQLException {
-        Map<String, Pair> accountFilter = Map.of(Query.ID_LABEL, new Pair(resultSet.getString(ACCOUNT_LABEL), true));
-        List<Account> found = accountRepository.findAll(accountFilter);
-
         return new Transaction(
             resultSet.getString(Query.ID_LABEL),
             resultSet.getString(LBL_LABEL),
             resultSet.getBigDecimal(AMOUNT_LABEL),
             resultSet.getTimestamp(DATETIME_LABEL).toLocalDateTime(),
-            TransactionType.valueOf(resultSet.getString(TYPE_LABEL)),
-            found.get(0)
+            TransactionType.valueOf(resultSet.getString(TYPE_LABEL))
         );
     }
 
     @Override
     public List<Transaction> findAll(Map<String, Pair> filters) throws SQLException {
         List<Transaction> results = new ArrayList<>();
-        ResultSet resultSet = Query.selectAll(TABLE_NAME, filters);
+        ResultSet resultSet = Query.selectAll(TABLE_NAME, filters, null);
         while(resultSet.next()){
             results.add(createInstance(resultSet));
         }
@@ -46,11 +41,11 @@ public class TransactionRepository implements BasicRepository<Transaction>{
     }
 
     @Override
-    public List<Transaction> saveAll(List<Transaction> toSave) {
+    public List<Transaction> saveAll(List<Transaction> toSave, String meta) {
         List<Transaction> result = new ArrayList<>();
         toSave.forEach(el-> {
             try {
-                result.add(save(el));
+                result.add(save(el, meta));
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
@@ -59,13 +54,13 @@ public class TransactionRepository implements BasicRepository<Transaction>{
     }
 
     @Override
-    public Transaction save(Transaction toSave) throws SQLException {
+    public Transaction save(Transaction toSave, String idAccount) throws SQLException {
         Map<String,Pair> values = Map.of(
             Query.ID_LABEL, new Pair(toSave.getId(), true),
             LBL_LABEL, new Pair(toSave.getLabel(), true),
             DATETIME_LABEL, new Pair(toSave.getTransactionDatetime().toString(), true),
             TYPE_LABEL,new Pair(toSave.getType().toString(),true),
-            ACCOUNT_LABEL, new Pair(toSave.getAccount().getId(), true),
+            ACCOUNT_LABEL, new Pair(idAccount, true),
             AMOUNT_LABEL, new Pair(toSave.getAmount().toString(), false)
         );
 
