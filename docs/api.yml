@@ -133,7 +133,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/Account'
+                $ref: '#/components/schemas/CreateAccount'
       responses:
         200:
           $ref: '#/components/responses/AccountList200'
@@ -272,9 +272,8 @@ components:
     TransactionType:
       type: string
       enum:
-        - WITHDRAWAL
-        - DEPOSIT
-        - TRANSFER
+        - DEBIT 
+        - CREDIT 
     Transaction:
       type: object
       properties:
@@ -282,30 +281,19 @@ components:
           type: string
           format: uuid
           example: '550e8400-e29b-41d4-a716-446655440000'
-        ref:
+        label:
           type: string
-          example: '1201-244'
+          example: 'Some label'
         type:
           $ref: '#/components/schemas/TransactionType'
-        description:
-          type: string
-          example: 'Some description'
         amount:
           type: number
-          format: float 
+          format: fouble 
           example: 2000.2
         transaction_datetime:
           type: string
           format: date-time
           example: '2021-01-01 02:01:01'
-        destination_account:
-          type: string
-          format: uuid
-          example: '550e8400-e29b-41d4-a716-446655440000'
-        source_account:
-          type: string
-          format: uuid
-          example: '550e8400-e29b-41d4-a716-446655440000'
     AccountBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
@@ -320,7 +308,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Account'
-    Account:
+    CreateAccount:
       type: object
       properties:
         id:
@@ -334,34 +322,28 @@ components:
           $ref: '#/components/schemas/AccountType' 
         balance:
           type: number
-          format: float 
+          format: double 
           example: 2000.2
-        number:
+        currency: 
           type: string
-          example: '101-0151'
-        creation_date:
-          type: string
-          format: date
-          example: '2023-01-01'
-        comment: 
-          type: string
-          example: some comments
-        owner: 
-          type: string
-          example: Rabe
-        bank_name:
-          type: string
-          example: BMOI
+          example: '550e8400-e29b-41d4-a716-446655440000'
+    Account:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateAccount'
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
         currency:
           $ref: '#/components/schemas/Currency'
     AccountType:
       type: string
       enum:
-        - CHECKING 
-        - SAVING
-        - BUSINESS
-        - INVESTMENT
-        - CERTIFICATE_OF_DEPOSIT
+        - BANK
+        - CASH
+        - MOBILE MONEY
     CurrencyBody:
       allOf:
         - $ref: '#/components/schemas/ResponseBody'
@@ -389,18 +371,6 @@ components:
         code:
           type: string
           example: 'MGA'
-        symbol:
-          type: string
-          example: 'Ar'
-        exchange_rate:
-          type: number
-          format: float
-          example: 0.0002
-        updated_at:
-          type: string
-          format: date
-          description: current_date if not specified
-          example: '2023-01-01'
     ResponseBody:
       type: object
       properties:
