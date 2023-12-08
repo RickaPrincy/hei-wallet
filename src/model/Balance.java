@@ -8,13 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Transaction {
-    private String id;
-    private String description;
+@NoArgsConstructor
+public class Balance {
     private BigDecimal amount;
-    private LocalDateTime transactionDatetime;
-    private TransactionType type;
-    private Account account;
+    private LocalDateTime updatedAt;
 }
