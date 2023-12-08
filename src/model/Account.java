@@ -12,8 +12,8 @@ import java.util.List;
 public class Account {
     private String id;
     private String name;
-    private Balance balance;
     private AccountType type;
     private Currency currency;
+    private Balance balance;
     private List<Transaction> transactions;
 }

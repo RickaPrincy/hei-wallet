@@ -12,9 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Transaction {
     private String id;
-    private String description;
+    private String label;
     private BigDecimal amount;
     private LocalDateTime transactionDatetime;
     private TransactionType type;
-    private Account account;
 }

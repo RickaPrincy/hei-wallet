@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Query {
+    public final static String ID_LABEL = "id";
     private final static Connection connection = PostgresqlConnection.getConnection();
     public static String toSqlName(String text){
         return "\"" + text +  "\"";
@@ -21,10 +22,13 @@ public class Query {
                 .collect(Collectors.joining(", "));
     }
 
-    public static ResultSet selectAll(String tableName, Map<String, Pair> filters) throws SQLException {
+    public static ResultSet selectAll(String tableName, Map<String, Pair> filters, String suffixSQL) throws SQLException {
         String query = "SELECT * FROM " + toSqlName(tableName);
         if(filters != null && !filters.isEmpty())
             query += " WHERE " + createKeyValue(filters);
+        if(suffixSQL != null){
+            query += suffixSQL;
+        }
         return connection.createStatement().executeQuery(query);
     }
 

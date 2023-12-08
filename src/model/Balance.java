@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Balance {
+    private String id;
     private BigDecimal amount;
-    private LocalDateTime updatedAt;
+    private LocalDateTime creationDatetime;
 }
