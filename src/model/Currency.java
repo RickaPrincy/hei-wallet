@@ -3,13 +3,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Currency {
-    private String id, name,code, symbol;
-    private float exchangeRate;
-    private Date updatedAt;
+    private String id;
+    private String name;
+    private String code;
 }
