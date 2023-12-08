@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class Main {
         accountRepository.findAll(null).forEach(System.out::println);
 */
 
+/*
         System.out.println(accountRepository.doTransaction(new Transaction(
             null,
             "first transaction",
@@ -29,5 +31,8 @@ public class Main {
             null,
             TransactionType.DEBIT
         ), "account_id1"));
+*/
+    accountRepository.getBalance("account_id1",  LocalDateTime.of(2023,01,01,01,1,1), LocalDateTime.now())
+        .forEach(System.out::println);
     }
 }

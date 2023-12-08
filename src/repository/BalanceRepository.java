@@ -16,7 +16,7 @@ public class BalanceRepository implements BasicRepository<Balance>{
     public final static String ACCOUNT_LABEL= "account";
     public final static String TABLE_NAME = "balance_history";
 
-    private static Balance createInstance(ResultSet resultSet) throws SQLException {
+    public static Balance createInstance(ResultSet resultSet) throws SQLException {
         return new Balance(
             resultSet.getString(Query.ID_LABEL),
             resultSet.getBigDecimal(AMOUNT_LABEL),
