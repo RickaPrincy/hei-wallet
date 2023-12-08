@@ -1,0 +1,86 @@
+package mock.tests;
+
+import model.*;
+import repository.AccountRepository;
+
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class AccountTest {
+    private static final AccountRepository accountRepository = new AccountRepository();
+    public static void findAll() throws SQLException {
+        System.out.println("\"Find all with no filters params: ");
+        accountRepository.findAll(null, null).forEach(System.out::println);
+    }
+
+    public static void update(){
+        System.out.println("Update account test");
+        System.out.println(accountRepository.saveAll(List.of(
+            new Account(
+                "account_id1",
+                "name_updated",
+                null,
+                AccountType.BANK,
+                new Currency("currency_ariary", null,null),
+                null
+            )
+        ), null));
+    }
+
+    public static void create(){
+        System.out.println("Insert account test");
+        System.out.println(accountRepository.saveAll(List.of(
+            new Account(
+                null,
+                "name_insertd",
+                null,
+                AccountType.BANK,
+                new Currency("currency_ariary", null,null),
+                null
+            )
+        ), null));
+    }
+    public static void doTransaction () throws SQLException {
+        System.out.println(accountRepository.doTransaction("account_id1", new Transaction(
+            null, "label_transaction", BigDecimal.valueOf(1000), null, TransactionType.CREDIT
+        )));
+    }
+
+    public static void getBalance() throws SQLException {
+        System.out.println(accountRepository.getBalance("account_id1", LocalDateTime.now()));
+        System.out.println(accountRepository.getBalance(
+            "account_id1",
+            LocalDateTime.of(2022,01,01, 01, 01,01)
+        ));
+    }
+
+    public static void getBalanceInterval() throws SQLException {
+        System.out.println(accountRepository.getBalanceInterval(
+            "account_id1",
+            LocalDateTime.of(2022,01,01, 01, 01,01),
+            LocalDateTime.now()
+        ));
+
+        System.out.println(accountRepository.getBalanceInterval(
+            "account_id1",
+            LocalDateTime.of(2022,01,01, 01, 01,01),
+            LocalDateTime.of(2023,01,01, 01, 01,01)
+        ));
+    }
+
+    public static void getCurrentBalance() throws SQLException {
+        System.out.println(accountRepository.getCurrentBalance("account_id1"));
+    }
+
+    public static void launch() throws SQLException {
+        AccountTest.findAll();
+        AccountTest.create();
+        AccountTest.update();
+        AccountTest.doTransaction();
+        AccountTest.getBalance();
+        AccountTest.getBalanceInterval();
+        AccountTest.getCurrentBalance();
+    }
+}
