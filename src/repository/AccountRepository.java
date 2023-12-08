@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import model.Account;
 import model.AccountType;
 import model.Balance;
+import model.Currency;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +31,13 @@ public class AccountRepository implements BasicRepository<Account>{
         Map<String, Pair> transactionFilter = Map.of(TransactionRepository.ACCOUNT_LABEL, new Pair(resultSet.getString(Query.ID_LABEL), true));
         Map<String, Pair> currencyFilter = Map.of(Query.ID_LABEL, new Pair(resultSet.getString(CURRENCY_LABEL), true));
 
+        List<Balance> balanceList = balanceRepository.findAll(balanceFilter);
         return new Account(
             resultSet.getString(Query.ID_LABEL),
             resultSet.getString(NAME_LABEL),
             AccountType.valueOf(resultSet.getString(TYPE_LABEL)),
             currencyRepository.findAll(currencyFilter).get(0),
-            balanceRepository.findAll(balanceFilter).get(0),
+            balanceList.size() > 0 ? balanceList.get(0) : new Balance("-", BigDecimal.valueOf(0), LocalDateTime.now()),
             transactionRepository.findAll(transactionFilter)
         );
     }
@@ -50,42 +54,29 @@ public class AccountRepository implements BasicRepository<Account>{
 
     @Override
     public List<Account> saveAll(List<Account> toSave, String meta) {
-/*
         List<Account> result = new ArrayList<>();
         toSave.forEach(el-> {
             try {
-                result.add(save(el));
+                result.add(save(el, meta));
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
         });
         return result;
-*/
-        return null;
     }
 
     @Override
     public Account save(Account toSave, String meta) throws SQLException {
-/*
         Map<String,Pair> values = Map.of(
-            "id", new Pair(toSave.getId(), true),
-            "name", new Pair(toSave.getName(), true),
-            "comment", new Pair(toSave.getComment(),true),
-            "owner", new Pair(toSave.getOwner(), true),
-            "bank_name", new Pair(toSave.getBankName(), true),
-            "number", new Pair(toSave.getNumber(), true),
-            "creation_date", new Pair(toSave.getCreation_date().toString(), true),
-            "balance", new Pair(toSave.getBalance().toString(), false),
-            "type", new Pair(toSave.getType().toString(), true),
-            "currency", new Pair(toSave.getCurrency().getId(), true)
+            Query.ID_LABEL, new Pair(toSave.getId(), true),
+            NAME_LABEL, new Pair(toSave.getName(), true),
+            TYPE_LABEL, new Pair(toSave.getType().toString(),true),
+            CURRENCY_LABEL, new Pair(toSave.getCurrency().getId(), true)
         );
 
-        String id = Query.saveOrUpdate("account", values);
-
+        String id = Query.saveOrUpdate(TABLE_NAME, values);
         if(id != null)
             toSave.setId(id);
         return toSave;
-*/
-        return null;
     }
 }

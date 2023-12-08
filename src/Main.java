@@ -32,12 +32,26 @@ public class Main {
             new Currency("currency_ariary", "name_inserted", "code_inserted")
         ));
 */
+        Currency insertedCurrency = new Currency("currency_euro", "name_inserted", "code_inserted");
+        Account insertAccount = new Account(
+            null,
+            "nametest",
+            AccountType.BANK,
+            insertedCurrency,
+            new Balance(null, null, null),
+            null
+        );
+
+        System.out.println(accountRepository.save(insertAccount, null));
+
 
         //findALlWith no filter
         currencyRepository.findAll(null).forEach(System.out::println);
         balanceRepository.findAll(null).forEach(System.out::println);
         transactionRepository.findAll(null).forEach(System.out::println);
+/*
         accountRepository.findAll(null).forEach(System.out::println);
+*/
 /*
         AccountRepository accountRepository = new AccountRepository();
         accountRepository.findAll(null).forEach(System.out::println);
