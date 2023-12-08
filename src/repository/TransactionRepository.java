@@ -1,76 +1,82 @@
 package repository;
 
-import lombok.AllArgsConstructor;
-import model.Account;
 import model.Transaction;
 import model.TransactionType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
 
-@AllArgsConstructor
 public class TransactionRepository implements BasicRepository<Transaction>{
-    private final static AccountRepository accountRepository = new AccountRepository();
-    private static Transaction createInstance(ResultSet resultSet) throws SQLException {
-        Map<String, Pair> sourceFilter = Map.of("id", new Pair(resultSet.getString("source_account"), true));
-        Map<String, Pair> destinationFilter = Map.of("id", new Pair(resultSet.getString("destination_account"), true));
-        List<Account> found = accountRepository.findAll(destinationFilter);
-
-        return new Transaction(
-            resultSet.getString("id"),
-            resultSet.getString("description"),
-            resultSet.getBigDecimal("amount"),
-            accountRepository.findAll(sourceFilter).get(0),
-            !found.isEmpty() ? found.get(0) : null,
-            resultSet.getTimestamp("transaction_datetime"),
-            TransactionType.valueOf(resultSet.getString("type"))
-        );
-    }
-
-    @Override
-    public List<Transaction> findAll(Map<String, Pair> filters) throws SQLException {
-        List<Transaction> results = new ArrayList<>();
-        ResultSet resultSet = Query.selectAll("transaction", filters);
-        while(resultSet.next()){
-            results.add(createInstance(resultSet));
+    public final static String
+            LBL_LABEL = "label",
+            AMOUNT_LABEL= "amount",
+            DATETIME_LABEL= "transaction_datetime",
+            ACCOUNT_LABEL= "account",
+            TYPE_LABEL= "type",
+            TABLE_NAME="transaction";
+    private static Transaction createInstance(ResultSet resultSet){
+        try {
+            return new Transaction(
+                resultSet.getString(Query.ID_LABEL),
+                resultSet.getString(LBL_LABEL),
+                resultSet.getBigDecimal(AMOUNT_LABEL),
+                resultSet.getTimestamp(DATETIME_LABEL).toLocalDateTime(),
+                TransactionType.valueOf(resultSet.getString(TYPE_LABEL))
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
         }
-        return results;
+    }
+
+    public static LinkedHashMap<String, Object> setMapValues(Transaction transaction, String meta){
+        LinkedHashMap<String, Object> valuesKeys = new LinkedHashMap<>(Map.of(
+            AMOUNT_LABEL, transaction.getAmount() == null ? 0 : transaction.getAmount(),
+            ACCOUNT_LABEL, meta,
+            LBL_LABEL, transaction.getLabel(),
+            TYPE_LABEL, transaction.getType()
+        ));
+
+        if(transaction.getId() != null){
+            valuesKeys.put(DATETIME_LABEL, Timestamp.valueOf(LocalDateTime.now()));
+            valuesKeys.put(Query.ID_LABEL, transaction.getId());
+        }
+        return valuesKeys;
     }
 
     @Override
-    public List<Transaction> saveAll(List<Transaction> toSave) {
+    public List<Transaction> findAll(Map<String, Object> filters, String suffix) throws SQLException {
+        return StatementWrapper.selectAll( TABLE_NAME, filters, suffix, TransactionRepository::createInstance);
+    }
+
+    @Override
+    public List<Transaction> saveAll(List<Transaction> toSave, String meta) {
         List<Transaction> result = new ArrayList<>();
-        toSave.forEach(el-> {
+        toSave.forEach(el -> {
             try {
-                result.add(save(el));
+                result.add(save(el, meta));
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                throw new RuntimeException(e.getMessage());
             }
         });
+
         return result;
     }
 
     @Override
-    public Transaction save(Transaction toSave) throws SQLException {
-        Map<String,Pair> values = Map.of(
-            "id", new Pair(toSave.getId(), true),
-            "description", new Pair(toSave.getDescription(), true),
-                "transaction_datetime", new Pair(toSave.getTransactionDatetime().toString(), true),
-            "amount",new Pair(toSave.getAmount().toString(),false),
-            "type",new Pair(toSave.getType().toString(),true),
-            "source_account", new Pair(toSave.getSourceAccount().getId(), true),
-            "destination_account", new Pair(
-                toSave.getDestinationAccount() != null ? toSave.getDestinationAccount().getId(): null, false
-            )
-        );
-
-        String id = Query.saveOrUpdate("transaction", values);
-
-        if(id != null)
-            toSave.setId(id);
+    public Transaction save(Transaction toSave, String meta) throws SQLException {
+        StatementWrapper.saveOrUpdate(TABLE_NAME, setMapValues(toSave, meta), resultSet -> {
+            try {
+                if(resultSet.next()){
+                    toSave.setId(resultSet.getString(1));
+                    toSave.setTransactionDatetime(resultSet.getTimestamp(2).toLocalDateTime());
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
         return toSave;
     }
 }
