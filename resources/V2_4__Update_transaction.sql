@@ -1,0 +1,2 @@
+ALTER TABLE "transaction"
+ADD COLUMN IF NOT EXISTS "transaction_date" DATETIME NOT NULL;

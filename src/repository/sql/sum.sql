@@ -14,4 +14,3 @@ BEGIN
 
     RETURN sum;
 END $$;
-
