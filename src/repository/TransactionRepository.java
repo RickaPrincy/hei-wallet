@@ -1,5 +1,7 @@
 package repository;
 
+import model.Balance;
+import model.Currency;
 import model.Transaction;
 import model.TransactionType;
 
@@ -31,16 +33,22 @@ public class TransactionRepository implements BasicRepository<Transaction>{
         }
     }
 
-    public static LinkedHashMap<String, Object> setMapValues(Transaction transaction, String meta){
+    public static QueryValues updateQuery(Transaction transaction, String meta){
+        LinkedHashMap<String, Object> transactionValues = TransactionRepository.getMapValues(transaction, meta);
+        String transactionQuery = Query.saveOrUpdate(TABLE_NAME, new ArrayList<>(transactionValues.keySet()));
+        return new QueryValues( transactionQuery, new ArrayList<>(transactionValues.values()));
+    }
+
+    public static LinkedHashMap<String, Object> getMapValues(Transaction transaction, String meta){
         LinkedHashMap<String, Object> valuesKeys = new LinkedHashMap<>(Map.of(
             AMOUNT_LABEL, transaction.getAmount() == null ? 0 : transaction.getAmount(),
             ACCOUNT_LABEL, meta,
             LBL_LABEL, transaction.getLabel(),
-            TYPE_LABEL, transaction.getType()
+            TYPE_LABEL, transaction.getType(),
+            DATETIME_LABEL, Timestamp.valueOf(LocalDateTime.now())
         ));
 
         if(transaction.getId() != null){
-            valuesKeys.put(DATETIME_LABEL, Timestamp.valueOf(LocalDateTime.now()));
             valuesKeys.put(Query.ID_LABEL, transaction.getId());
         }
         return valuesKeys;
@@ -48,35 +56,32 @@ public class TransactionRepository implements BasicRepository<Transaction>{
 
     @Override
     public List<Transaction> findAll(Map<String, Object> filters, String suffix) throws SQLException {
-        return StatementWrapper.selectAll( TABLE_NAME, filters, suffix, TransactionRepository::createInstance);
+        String query = Query.selectAll(TABLE_NAME, filters.keySet().stream().toList(), suffix);
+        return StatementWrapper.select( query, filters.values().stream().toList(), TransactionRepository::createInstance);
     }
 
+    public List<Transaction> findAll(String suffix) throws SQLException {
+        return findAll(Query.emptyMapValues(), suffix);
+    }
+    public List<Transaction> findAll() throws SQLException {
+        return findAll(Query.emptyMapValues(), null);
+    }
     @Override
-    public List<Transaction> saveAll(List<Transaction> toSave, String meta) {
+    public List<Transaction> saveAll(List<Transaction> toSave, String meta) throws SQLException {
         List<Transaction> result = new ArrayList<>();
-        toSave.forEach(el -> {
-            try {
-                result.add(save(el, meta));
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        });
-
+        for(Transaction transaction: toSave){
+            Transaction saved = save(transaction, meta);
+            result.add(saved);
+        }
         return result;
     }
 
     @Override
     public Transaction save(Transaction toSave, String meta) throws SQLException {
-        StatementWrapper.saveOrUpdate(TABLE_NAME, setMapValues(toSave, meta), resultSet -> {
-            try {
-                if(resultSet.next()){
-                    toSave.setId(resultSet.getString(1));
-                    toSave.setTransactionDatetime(resultSet.getTimestamp(2).toLocalDateTime());
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        });
+        QueryValues queryValues = updateQuery(toSave, meta);
+        ResultSet resultSet = StatementWrapper.update(queryValues.getQuery(), queryValues.getValues());
+        if(resultSet.next())
+            toSave.setId(resultSet.getString(1));
         return toSave;
     }
 }

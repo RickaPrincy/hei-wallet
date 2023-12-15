@@ -11,17 +11,17 @@ public class BalanceTest {
     private static final BalanceRepository balanceRepository = new BalanceRepository();
     public static void findAll() throws SQLException {
         System.out.println("\"Find all with no filters params: ");
-        balanceRepository.findAll(null, null).forEach(System.out::println);
+        balanceRepository.findAll().forEach(System.out::println);
     }
 
-    public static void update(){
+    public static void update() throws SQLException {
         System.out.println("Update balance test");
         System.out.println(balanceRepository.saveAll(List.of(
             new Balance("history_entry_1", BigDecimal.valueOf(250),null)
         ), "account_id1"));
     }
 
-    public static void create(){
+    public static void create() throws SQLException {
         System.out.println("Insert balance test");
         System.out.println(balanceRepository.saveAll(List.of(
             new Balance(null, BigDecimal.valueOf(200), null)

@@ -12,7 +12,7 @@ public class CurrencyTest {
     private static final CurrencyRepository currencyRepository = new CurrencyRepository();
     public static void findAll() throws SQLException {
         System.out.println("\"Find all with no filters params: ");
-        currencyRepository.findAll(null, null).forEach(System.out::println);
+        currencyRepository.findAll().forEach(System.out::println);
 
 
         System.out.println("\nFind all with id filters");
@@ -27,14 +27,14 @@ public class CurrencyTest {
         currencyRepository.findAll(idNameFilters, null).forEach(System.out::println);
     }
 
-    public static void update(){
+    public static void update() throws SQLException {
         System.out.println("Update currency test");
         System.out.println(currencyRepository.saveAll(List.of(
             new Currency("currency_dollar", "Dollar", "code_inserted")
         ), null));
     }
 
-    public static void create(){
+    public static void create() throws SQLException {
         System.out.println("Insert currency test");
         System.out.println(currencyRepository.saveAll(List.of(
                 new Currency(null, "name_inserted", "code_inserted")

@@ -12,10 +12,10 @@ public class AccountTest {
     private static final AccountRepository accountRepository = new AccountRepository();
     public static void findAll() throws SQLException {
         System.out.println("\"Find all with no filters params: ");
-        accountRepository.findAll(null, null).forEach(System.out::println);
+        accountRepository.findAll().forEach(System.out::println);
     }
 
-    public static void update(){
+    public static void update() throws SQLException {
         System.out.println("Update account test");
         System.out.println(accountRepository.saveAll(List.of(
             new Account(
@@ -29,7 +29,7 @@ public class AccountTest {
         ), null));
     }
 
-    public static void create(){
+    public static void create() throws SQLException {
         System.out.println("Insert account test");
         System.out.println(accountRepository.saveAll(List.of(
             new Account(

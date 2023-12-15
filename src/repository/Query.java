@@ -1,18 +1,27 @@
 package repository;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Query {
     public final static String ID_LABEL = "id";
+
     public static String toSqlName(String text){
         return "\"" + text +  "\"";
     }
     public static String mapKeys(List<String> keys, String separator, String suffix) {
         return keys.stream().map(el -> toSqlName(el) + suffix).collect(Collectors.joining(separator));
     }
+    public static Map<String, Object> emptyMapValues(){
+        return new LinkedHashMap<String, Object>();
+    }
     public static String transaction(List<String> queries){
         return "BEGIN;\n" + String.join("\n", queries) + "\nCOMMIT;";
+    }
+    public static String transaction(String query){
+        return transaction(List.of(query));
     }
 
     public static String selectAll(String tableName, List<String> filters, String suffix){
@@ -30,13 +39,13 @@ public class Query {
         if(columns.contains(Query.ID_LABEL)){
             List<String> withoutId = columns.stream().filter(el -> !el.equals(ID_LABEL)).collect(Collectors.toList());
             query = "UPDATE " + toSqlName(tableName) + " SET " +
-                    mapKeys(withoutId, " , ", "=?") +
-                    " WHERE " + toSqlName(ID_LABEL) + " =?";
+                mapKeys(withoutId, " , ", "=?") +
+                " WHERE " + toSqlName(ID_LABEL) + " =?";
         }else{
             query = "INSERT INTO " + toSqlName(tableName) +  "("  +
                 mapKeys(columns, ",", "") + ") VALUES ( ?" +
                 " ,?".repeat(columns.size() - 1) + " )";
         }
-        return query + " ;";
+        return query + " ;\n";
     }
 }

@@ -26,29 +26,12 @@ public class StatementWrapper {
         return statement;
     }
 
-    public static <T> List<T> selectAll(String tableName, Map<String, Object> filters, String suffix, Function<ResultSet, T> mapper) throws SQLException {
-        List<String> keys = filters != null ? new ArrayList<>(filters.keySet()) : null;
-        List<Object> values = filters != null ? new ArrayList<>(filters.values()) : null;
-
-        String query = Query.selectAll(tableName, keys, suffix);
-        QueryResult queryResult = StatementWrapper.select(query, values);
-        return StatementWrapper.mapResultSet(queryResult.getResult(), mapper);
-    }
-    public static QueryResult select(String query, List<Object> values) throws SQLException {
-        PreparedStatement statement = prepared(query, values);
-        ResultSet result = statement.executeQuery();
-        ResultSet generated = statement.getGeneratedKeys();
-        return new QueryResult(result, generated);
-    }
-
-    public static void saveOrUpdate(String tableName, Map<String, Object> values, Consumer<ResultSet> setter) throws SQLException {
-        String query = Query.saveOrUpdate(tableName, new ArrayList<>(values.keySet()));
-        ResultSet resultSet = StatementWrapper.update(query, new ArrayList<>(values.values()));
-        setter.accept(resultSet);
+    public static <T> List<T> select(String query, List<Object> values, Function<ResultSet, T> mapper) throws SQLException {
+        return StatementWrapper.mapResultSet(prepared(query, values).executeQuery(), mapper);
     }
 
     public static ResultSet update(String query, List<Object> values) throws SQLException {
-        PreparedStatement statement = StatementWrapper.prepared(query, values);
+        PreparedStatement statement = prepared(query, values);
         statement.executeUpdate();
         return statement.getGeneratedKeys();
     }

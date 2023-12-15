@@ -9,16 +9,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AccountRepository implements BasicRepository<Account>{
     private static final CurrencyRepository currencyRepository = new CurrencyRepository();
     private static final BalanceRepository balanceRepository= new BalanceRepository();
     private static final TransactionRepository transactionRepository = new TransactionRepository();
     private final static String
-            TABLE_NAME ="account",
-            NAME_LABEL="name",
-            TYPE_LABEL="type",
-            CURRENCY_LABEL="currency";
+        TABLE_NAME ="account",
+        NAME_LABEL="name",
+        TYPE_LABEL="type",
+        CURRENCY_LABEL="currency";
 
     private static Account createInstance(ResultSet resultSet) {
         try {
@@ -39,7 +40,7 @@ public class AccountRepository implements BasicRepository<Account>{
             throw new RuntimeException(e.getMessage());
         }
     }
-    public static LinkedHashMap<String, Object> setMapValues(Account account){
+    public static LinkedHashMap<String, Object> getMapValues(Account account, String meta){
         LinkedHashMap<String, Object> valuesKeys = new LinkedHashMap<>(Map.of(
             NAME_LABEL, account.getName(),
             TYPE_LABEL, account.getType(),
@@ -52,72 +53,58 @@ public class AccountRepository implements BasicRepository<Account>{
 
     @Override
     public List<Account> findAll(Map<String, Object> filters, String suffix) throws SQLException {
-        return StatementWrapper.selectAll(
-            TABLE_NAME,
-            filters,
-            suffix,
-            AccountRepository::createInstance
-        );
+        String query = Query.selectAll(TABLE_NAME,filters.keySet().stream().toList(), suffix);
+        return StatementWrapper.select(query, filters.values().stream().toList(), AccountRepository::createInstance);
     }
 
+    public List<Account> findAll(String suffix) throws SQLException {
+        return findAll(Query.emptyMapValues(), suffix);
+    }
+    public List<Account> findAll() throws SQLException {
+        return findAll(Query.emptyMapValues(), null);
+    }
     @Override
-    public List<Account> saveAll(List<Account> toSave, String meta) {
+    public List<Account> saveAll(List<Account> toSave, String meta) throws SQLException {
         List<Account> result = new ArrayList<>();
-        toSave.forEach(el -> {
-            try {
-                result.add(save(el, meta));
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        });
+        for(Account account: toSave){
+            Account saved = save(account, meta);
+            result.add(saved);
+        }
         return result;
     }
 
     @Override
     public Account save(Account toSave, String meta) throws SQLException {
-        StatementWrapper.saveOrUpdate(TABLE_NAME, setMapValues(toSave), resultSet -> {
-            try {
-                if(resultSet.next()){
-                    String id = resultSet.getString(1);
-                    Currency currency = currencyRepository.findAll(Map.of(Query.ID_LABEL, toSave.getCurrency().getId()), null).get(0);
-                    Balance balance = balanceRepository.findAll(Map.of(BalanceRepository.ACCOUNT_LABEL, id), null).get(0);
-                    List<Transaction> transactions = transactionRepository.findAll( Map.of(TransactionRepository.ACCOUNT_LABEL, id), null);
+        Map<String, Object> valuesKeys = getMapValues(toSave, meta);
+        String query = Query.saveOrUpdate(TABLE_NAME, valuesKeys.keySet().stream().toList());
+        ResultSet resultSet = StatementWrapper.update(query, valuesKeys.values().stream().toList());
 
-                    toSave.setId(id);
-                    toSave.setCurrency(currency);
-                    toSave.setBalance(balance);
-                    toSave.setTransactions(transactions);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        });
+        if(resultSet.next()){
+            String id = resultSet.getString(1);
+            Currency currency = currencyRepository.findAll(Map.of(Query.ID_LABEL, toSave.getCurrency().getId()), null).get(0);
+            Balance balance = balanceRepository.findAll(Map.of(BalanceRepository.ACCOUNT_LABEL, id), null).get(0);
+            List<Transaction> transactions = transactionRepository.findAll( Map.of(TransactionRepository.ACCOUNT_LABEL, id), null);
+
+            toSave.setId(id);
+            toSave.setCurrency(currency);
+            toSave.setBalance(balance);
+            toSave.setTransactions(transactions);
+        }
         return toSave;
     }
 
-    public void createBalanceAndTransaction(Account target, Transaction transaction) throws SQLException {
-        if(
-            transaction.getType() == TransactionType.DEBIT &&
-            target.getType() != AccountType.BANK &&
-            transaction.getAmount().compareTo(target.getBalance().getAmount()) < 0
-        ){
-            return;
-        }
+    public static QueryValues balanceAndTransactionQuery(Account target, Transaction transaction){
         BigDecimal transactionValue = transaction.getType() == TransactionType.DEBIT ? transaction.getAmount().negate() : transaction.getAmount();
         Balance newBalance = new Balance(null, transactionValue.add(target.getBalance().getAmount()), null);
-        LinkedHashMap<String, Object> balanceValues= BalanceRepository.setMapValues( newBalance, target.getId());
-        LinkedHashMap<String, Object> transactionValues= TransactionRepository.setMapValues(transaction, target.getId());
+        QueryValues balanceQuery = BalanceRepository.updateQuery(newBalance, target.getId());
+        QueryValues transactionQuery = TransactionRepository.updateQuery(transaction, target.getId());
 
-        //Create sql query
-        String balanceQuery = Query.saveOrUpdate(BalanceRepository.TABLE_NAME,new ArrayList<>(balanceValues.keySet()));
-        String transactionQuery = Query.saveOrUpdate(TransactionRepository.TABLE_NAME, new ArrayList<>(transactionValues.keySet()));
+        //Concatenate queryValues
+        String query = balanceQuery.getQuery() + transactionQuery.getQuery();
+        List<Object> values = new ArrayList<>(balanceQuery.getValues());
+        values.addAll(transactionQuery.getValues());
 
-        //Concatenate and Map values to List<Object>
-        List<Object> values = new ArrayList<>(new ArrayList<>(balanceValues.values()));
-        values.addAll(new ArrayList<>(transactionValues.values()));
-
-        //do update
-        StatementWrapper.update(Query.transaction(List.of(balanceQuery, transactionQuery)), values);
+        return new QueryValues(query, values);
     }
 
     public Account doTransaction(String accountId, Transaction transaction) throws SQLException {
@@ -125,7 +112,8 @@ public class AccountRepository implements BasicRepository<Account>{
         if(accounts.isEmpty()){
             return null;
         }
-        createBalanceAndTransaction(accounts.get(0), transaction);
+        QueryValues queryValues = balanceAndTransactionQuery(accounts.get(0), transaction);
+        StatementWrapper.update(Query.transaction(queryValues.getQuery()), queryValues.getValues());
         return findAll(Map.of(Query.ID_LABEL, accountId)," LIMIT 1").get(0);
     }
 
