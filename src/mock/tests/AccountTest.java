@@ -7,6 +7,7 @@ import repository.CurrencyCrudOperations;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -78,6 +79,19 @@ public class AccountTest {
             LocalDateTime.of(2022,1,1, 1, 1,1)
         ));
     }
+
+    public static void getCategorySum() throws SQLException {
+        accountCrudOperations.getAllCategorySum("account_id1",LocalDate.of(2023,1,1), LocalDate.now()).forEach(System.out::println);
+    }
+
+    public static void getCategorySumWithJava() throws SQLException {
+        accountCrudOperations.getCategorySumWithJava(
+            "account_id1",
+            LocalDate.of(2023,1,1),
+            LocalDate.now()
+        ).forEach(System.out::println);
+    }
+
     public static void launch() throws SQLException {
         AccountTest.findAll();
         AccountTest.create();
@@ -86,5 +100,6 @@ public class AccountTest {
         AccountTest.getBalanceInterval();
         AccountTest.getBalanceInDate();
         AccountTest.getCurrentBalance();
+        AccountTest.getCategorySumWithJava();
     }
 }

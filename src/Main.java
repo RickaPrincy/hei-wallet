@@ -21,5 +21,6 @@ public class Main {
         currencyValueCrudOperations.findAll().forEach(System.out::println);
         System.out.println(currencyValueCrudOperations.findById("currency_value1"));
 */
+        AccountTest.launch();
     }
 }

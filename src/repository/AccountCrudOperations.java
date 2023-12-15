@@ -16,6 +16,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     private static final CurrencyCrudOperations currencyCrudOperations = new CurrencyCrudOperations();
     private static final BalanceCrudOperations balanceCrudOperations= new BalanceCrudOperations();
     private static final TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
+    private static final CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations();
     private final static String
         ID_LABEL="id",
         NAME_LABEL="name",
@@ -50,8 +51,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     @Override
     public List<Account> findAll() throws SQLException {
         String query = "SELECT * FROM \"account\"";
-        return StatementWrapper.select(query, null, AccountCrudOperations::createInstance);
-    }
+        return StatementWrapper.select(query, null, AccountCrudOperations::createInstance); }
 
     @Override
     public Account findById(String id) throws SQLException {
@@ -129,5 +129,46 @@ public class AccountCrudOperations implements CrudOperations<Account> {
 
     public Balance getCurrentBalance(String accountId) throws SQLException {
         return getBalanceInDate(accountId, LocalDateTime.now());
+    }
+
+    public List<CategorySum> getAllCategorySum(String accountId, LocalDate from, LocalDate to) throws SQLException {
+        String query = "SELECT * FROM sum_in_out_by_category(?, ? ,?);";
+        return StatementWrapper.select(query, List.of(accountId, from, to), resultSet -> {
+            try {
+                String CATEGORY_LABEL = "category_name", TOTAL_AMOUNT="total_amount";
+                return new CategorySum(
+                    resultSet.getString(CATEGORY_LABEL),
+                    resultSet.getBigDecimal(TOTAL_AMOUNT)
+                );
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+    }
+
+    public List<CategorySum> getCategorySumWithJava(String accountId, LocalDate from, LocalDate to) throws SQLException {
+        Account account = findById(accountId);
+        if(account == null)
+            return null;
+        List<Transaction> transactions = account.getTransactions();
+        HashMap<String, BigDecimal> categorySums = new HashMap<>();
+        for(Category category: categoryCrudOperations.findAll()){
+            categorySums.put(category.getName(), BigDecimal.valueOf(0));
+        }
+        transactions.forEach(el -> {
+            if(
+                el.getTransactionDatetime().toLocalDate().isAfter(to) ||
+                el.getTransactionDatetime().toLocalDate().isBefore(from)
+            ){
+                return;
+            }
+
+            String categoryName = el.getCategory().getName();
+            BigDecimal oldValue = categorySums.get(categoryName);
+            categorySums.put(categoryName, oldValue.add(el.getAmount()));
+        });
+        return categorySums.entrySet()
+            .stream().map(el -> new CategorySum(el.getKey(), el.getValue()))
+            .collect(Collectors.toList());
     }
 }

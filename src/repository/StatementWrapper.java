@@ -1,6 +1,7 @@
 package repository;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,9 @@ public class StatementWrapper {
             List<Object> filteredValues = values.stream().filter(Objects::nonNull).toList();
             for(int i = 1; i <= filteredValues.size(); i++){
                 Object current = filteredValues.get(i -1);
-                if(current instanceof LocalDateTime){
+                if(current instanceof LocalDate){
+                    statement.setDate(i, Date.valueOf((LocalDate) current));
+                } else if(current instanceof LocalDateTime){
                     statement.setTimestamp(i, Timestamp.valueOf((LocalDateTime) current));
                 }else if(current.getClass().isEnum()){
                     statement.setObject(i, current, Types.OTHER);
