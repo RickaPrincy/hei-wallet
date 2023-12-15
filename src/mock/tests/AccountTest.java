@@ -80,6 +80,16 @@ public class AccountTest {
         accountRepository.getAllCategorySum("account_id",LocalDate.of(2023,1,1), LocalDate.now()).forEach(System.out::println);
     }
 
+    public static void getCategorySumWithJava() throws SQLException {
+        AccountRepository accountRepository = new AccountRepository();
+            accountRepository.getCategorySumWithJava(
+                "account_id1",
+                LocalDate.of(2023,1,1),
+                LocalDate.now()
+        ).forEach(System.out::println);
+    }
+
+
     public static void launch() throws SQLException {
         AccountTest.findAll();
         AccountTest.create();
@@ -89,5 +99,6 @@ public class AccountTest {
         AccountTest.getBalanceInterval();
         AccountTest.getCurrentBalance();
         AccountTest.getCategorySum();
+        AccountTest.getCategorySumWithJava();
     }
 }

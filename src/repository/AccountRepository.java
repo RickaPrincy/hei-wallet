@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AccountRepository implements CrudOperations<Account> {
     private static final CurrencyRepository currencyRepository = new CurrencyRepository();
@@ -160,5 +161,30 @@ public class AccountRepository implements CrudOperations<Account> {
                 throw new RuntimeException(e.getMessage());
             }
         });
+    }
+
+    public List<CategorySum> getCategorySumWithJava(String accountId, LocalDate from, LocalDate to) throws SQLException {
+        List<Account> accounts = findAll(Map.of(Query.ID_LABEL, accountId),null);
+        if(accounts.isEmpty())
+            return null;
+        List<Transaction> transactions = accounts.get(0).getTransactions();
+        HashMap<String, BigDecimal> categorySums = new HashMap<>();
+        transactions.forEach(el -> {
+            if(
+                el.getTransactionDatetime().toLocalDate().isAfter(to) ||
+                el.getTransactionDatetime().toLocalDate().isBefore(from)
+            ){
+                return;
+            }
+
+            String categoryName = el.getCategory().getName();
+            if(categorySums.containsKey(categoryName)){
+                BigDecimal oldvalue = categorySums.getOrDefault(categoryName, BigDecimal.valueOf(0));
+                categorySums.put(categoryName, oldvalue.add(el.getAmount()));
+            }
+        });
+        return categorySums.entrySet()
+            .stream().map(el -> new CategorySum(el.getKey(), el.getValue()))
+            .collect(Collectors.toList());
     }
 }
