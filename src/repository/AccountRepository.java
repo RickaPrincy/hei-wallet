@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -144,5 +145,20 @@ public class AccountRepository implements CrudOperations<Account> {
 
     public Balance getCurrentBalance(String accountId) throws SQLException {
         return getBalance(accountId, LocalDateTime.now());
+    }
+
+    public List<CategorySum> getAllCategorySum(String accountId, LocalDate from, LocalDate to) throws SQLException {
+        String query = "SELECT * FROM sum_in_out_by_category(?, ? ,?);";
+        return StatementWrapper.select(query, List.of(accountId, from, to), resultSet -> {
+            try {
+                String CATEGORY_LABEL = "category_name", TOTAL_AMOUNT="total_amount";
+                return new CategorySum(
+                    resultSet.getString(CATEGORY_LABEL),
+                    resultSet.getBigDecimal(TOTAL_AMOUNT)
+                );
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
     }
 }

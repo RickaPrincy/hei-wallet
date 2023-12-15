@@ -5,6 +5,7 @@ import repository.AccountRepository;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -75,6 +76,10 @@ public class AccountTest {
         System.out.println(accountRepository.getCurrentBalance("account_id1"));
     }
 
+    public static void getCategorySum() throws SQLException {
+        accountRepository.getAllCategorySum("account_id",LocalDate.of(2023,01,01), LocalDate.now()).forEach(System.out::println);
+    }
+
     public static void launch() throws SQLException {
         AccountTest.findAll();
         AccountTest.create();
@@ -83,5 +88,6 @@ public class AccountTest {
         AccountTest.getBalance();
         AccountTest.getBalanceInterval();
         AccountTest.getCurrentBalance();
+        AccountTest.getCategorySum();
     }
 }

@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION sum_in_out_by_category(
     "account_id" VARCHAR(255),
     "from" TIMESTAMP,
     "to" TIMESTAMP
-) RETURNS TABLE (category_name VARCHAR(255), total_amount DECIMAL(18,5)) AS $$
+) RETURNS TABLE ("category_name" VARCHAR(255), "total_amount" DECIMAL(18,5)) AS $$
 BEGIN
     RETURN QUERY
     SELECT

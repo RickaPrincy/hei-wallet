@@ -2,10 +2,13 @@ package repository;
 
 import lombok.AllArgsConstructor;
 import model.Category;
+import model.CategorySum;
 import model.CategoryType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @AllArgsConstructor
@@ -66,4 +69,5 @@ public class CategoryRepository implements CrudOperations<Category> {
             toSave.setId(resultSet.getString(1));
         return toSave;
     }
+
 }
