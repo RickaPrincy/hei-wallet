@@ -3,8 +3,12 @@ package repository;
 import model.*;
 import model.Account;
 
+import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,10 +27,10 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             return new Account(
                 resultSet.getString(ID_LABEL),
                 resultSet.getString(NAME_LABEL),
-                null, /*balane*/
+                balanceCrudOperations.findOneByAccount(resultSet.getString(ID_LABEL)),
                 AccountType.valueOf(resultSet.getString(TYPE_LABEL)),
                 currencyCrudOperations.findById(resultSet.getString(CURRENCY_LABEL)),
-                null /* transaction */
+                transactionCrudOperations.findByAccount(resultSet.getString(ID_LABEL))
             );
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
@@ -81,5 +85,49 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         if(resultSet.next())
             toSave.setId(resultSet.getString(1));
         return toSave;
+    }
+    public Account doTransaction(Transaction transaction, String accountId) throws SQLException {
+        Account target = findById(accountId);
+        if(target == null)
+            return null;
+        BigDecimal transactionValue = transaction.getType() == TransactionType.DEBIT ? transaction.getAmount().negate() : transaction.getAmount();
+
+        //TODO throw specifiq error
+        if(target.getType() != AccountType.BANK
+            && transaction.getType() == TransactionType.DEBIT
+            && target.getBalance().getAmount().compareTo(transactionValue) < 0
+        ){
+            return null;
+        }
+
+        Balance newBalance = new Balance(null, transactionValue.add(target.getBalance().getAmount()), null);
+        balanceCrudOperations.save(newBalance, accountId);
+        transactionCrudOperations.save(transaction, accountId);
+        return findById(accountId);
+    }
+
+    public Balance getBalanceInterval(String accountId, LocalDateTime from, LocalDateTime to) throws SQLException {
+        String query =
+                "SELECT * FROM \"balance_history\" WHERE \"account\" = ? AND \"" +
+                BalanceCrudOperations.DATETIME_LABEL +
+                "\" BETWEEN ? AND ? ORDER BY \"" +  BalanceCrudOperations.DATETIME_LABEL +
+                "\" DESC LIMIT 1";
+        List<Object> values = List.of(accountId, from, to);
+        List<Balance> balances = StatementWrapper.select(query, values, BalanceCrudOperations::createInstance);
+        return balances.isEmpty() ? null : balances.get(0);
+    }
+
+    public Balance getBalanceInDate(String accountId, LocalDateTime dateTime) throws SQLException {
+        String query =
+            "SELECT * FROM \"balance_history\" WHERE \"account\"= ?" +
+            " AND \"" + BalanceCrudOperations.DATETIME_LABEL +
+            "\" <= ? ORDER BY \"" + BalanceCrudOperations.DATETIME_LABEL + "\" DESC LIMIT 1;";
+        List<Object> values = List.of(accountId, dateTime);
+        List<Balance> balances = StatementWrapper.select(query, values, BalanceCrudOperations::createInstance);
+        return balances.isEmpty() ? null : balances.get(0);
+    }
+
+    public Balance getCurrentBalance(String accountId) throws SQLException {
+        return getBalanceInDate(accountId, LocalDateTime.now());
     }
 }

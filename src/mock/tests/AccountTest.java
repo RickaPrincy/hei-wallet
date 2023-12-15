@@ -2,14 +2,18 @@ package mock.tests;
 
 import model.*;
 import repository.AccountCrudOperations;
+import repository.CategoryCrudOperations;
 import repository.CurrencyCrudOperations;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class AccountTest {
     private static final AccountCrudOperations accountCrudOperations = new AccountCrudOperations();
     private static final CurrencyCrudOperations currencyCrudOperations= new CurrencyCrudOperations();
+    private static final CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations();
     public static void findAll() throws SQLException {
         System.out.println("\"Find all with no filters params: ");
         accountCrudOperations.findAll().forEach(System.out::println);
@@ -43,10 +47,44 @@ public class AccountTest {
         ), null));
     }
 
+    public static void doTransaction () throws SQLException {
+        System.out.println(accountCrudOperations.findById("account_id1"));
+        Transaction transaction = new Transaction(null, "label_transaction", BigDecimal.valueOf(3000), null, TransactionType.DEBIT, categoryCrudOperations.findById("category_1"));
+        System.out.println(accountCrudOperations.doTransaction(transaction, "account_id1"));
+    }
 
+    public static void getBalanceInterval() throws SQLException {
+        System.out.println(accountCrudOperations.getBalanceInterval(
+            "account_id1",
+            LocalDateTime.of(2022,1,1, 1, 1,1),
+            LocalDateTime.now()
+        ));
+
+        System.out.println(accountCrudOperations.getBalanceInterval(
+            "account_id1",
+            LocalDateTime.of(2022,1,1, 1, 1,1),
+            LocalDateTime.of(2023,1,1, 1, 1,1)
+        ));
+    }
+
+    public static void getCurrentBalance() throws SQLException {
+        System.out.println(accountCrudOperations.getCurrentBalance("account_id1"));
+    }
+
+    public static void getBalanceInDate() throws SQLException {
+        System.out.println(accountCrudOperations.getBalanceInDate("account_id1", LocalDateTime.now()));
+        System.out.println(accountCrudOperations.getBalanceInDate(
+            "account_id1",
+            LocalDateTime.of(2022,1,1, 1, 1,1)
+        ));
+    }
     public static void launch() throws SQLException {
         AccountTest.findAll();
         AccountTest.create();
         AccountTest.update();
+        AccountTest.doTransaction();
+        AccountTest.getBalanceInterval();
+        AccountTest.getBalanceInDate();
+        AccountTest.getCurrentBalance();
     }
 }

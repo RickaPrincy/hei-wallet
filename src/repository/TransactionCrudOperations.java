@@ -64,6 +64,11 @@ public class TransactionCrudOperations implements CrudOperations<Transaction> {
             return null;
         return lists.get(0);
     }
+
+    public List<Transaction> findByAccount(String accountId) throws SQLException {
+        String query = "SELECT * FROM \"transaction\" WHERE \"account\"=? ORDER BY \"transaction_datetime\" DESC";
+        return StatementWrapper.select(query, List.of(accountId), TransactionCrudOperations::createInstance);
+    }
     @Override
     public List<Transaction> saveAll(List<Transaction> toSave, String meta) throws SQLException {
         List<Transaction> result = new ArrayList<>();

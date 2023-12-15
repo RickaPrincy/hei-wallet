@@ -1,5 +1,6 @@
 package repository;
 
+import com.sun.source.tree.LiteralTree;
 import model.Balance;
 
 import java.sql.*;
@@ -74,5 +75,13 @@ public class BalanceCrudOperations implements CrudOperations<Balance> {
             toSave.setId(resultSet.getString(1));
         toSave.setUpdatedAt(LocalDateTime.now());
         return toSave;
+    }
+
+    public Balance findOneByAccount(String accountId) throws SQLException {
+        String query = "SELECT * FROM \"balance_history\" WHERE \"account\"=? ORDER BY \"creation_datetime\" DESC LIMIT 1";
+        List<Balance> lists = StatementWrapper.select(query, List.of(accountId), BalanceCrudOperations::createInstance);
+        if(lists.isEmpty())
+            return null;
+        return lists.get(0);
     }
 }
