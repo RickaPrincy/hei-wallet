@@ -6,17 +6,19 @@ CREATE TABLE IF NOT EXISTS "currency_value" (
     "effective_date" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 INSERT INTO "currency_value"
-SELECT 'history_entry_2', 2000.00000, '2023-12-08T12:00:00Z', 'account_id2'
+SELECT 'currency_value_1', 'currency_euro', 'currency_ariary', 2000, '2023-12-01'
 WHERE NOT EXISTS (
-    SELECT 1 FROM "balance_history"
+    SELECT 1 FROM "currency_value"
     WHERE
-            "id"='history_entry_2' AND "balance"=2000.00000 AND "creation_datetime"='2023-12-08T12:00:00Z' AND "account"='account_id2'
+        "id"='currency_value_1' AND "source"='currency_euro' AND "destination"='curency_ariary' AND "amount"=2000
+        AND "effective_date" = '2023-12-01'
 );
 
-INSERT INTO "balance_history"
-SELECT 'history_entry_3', 2005.00000, '2023-12-08T12:00:00Z', 'account_id3'
+INSERT INTO "currency_value"
+SELECT 'currency_value_2', 'currency_ariary', 'currency_euro', 1, '2023-12-01'
 WHERE NOT EXISTS (
-    SELECT 1 FROM "balance_history"
+    SELECT 1 FROM "currency_value"
     WHERE
-            "id"='history_entry_3' AND "balance"=2005.00000 AND "creation_datetime"='2023-12-08T12:00:00Z' AND "account"='account_id3'
+            "id"='currency_value_2' AND "destination"='currency_euro' AND "source"='curency_ariary' AND "amount"=1000
+      AND "effective_date" = '2023-12-01'
 );

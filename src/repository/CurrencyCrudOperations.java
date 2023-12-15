@@ -2,15 +2,22 @@ package repository;
 
 import lombok.AllArgsConstructor;
 import model.Currency;
+import model.CurrencyValue;
+import repository.exception.CurrenyValueNotFoundException;
 
+import java.awt.font.ShapeGraphicAttribute;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class CurrencyCrudOperations implements CrudOperations<Currency> {
     public final static String ID_LABEL="id", NAME_LABEL = "name", CODE_LABEL = "code";
+    public final static CurrencyValueCrudOperations currencyValuesCrud = new CurrencyValueCrudOperations();
 
     private static Currency createInstance(ResultSet resultSet) {
         try {
@@ -69,5 +76,22 @@ public class CurrencyCrudOperations implements CrudOperations<Currency> {
         if(resultSet.next())
             toSave.setId(resultSet.getString(1));
         return toSave;
+    }
+
+    public BigDecimal getValueInDate(String currencyId, LocalDateTime datetime) throws SQLException, CurrenyValueNotFoundException {
+        String query = "SELECT * FROM \"currency_value\" WHERE \""+
+            CurrencyValueCrudOperations.DEST_LABEL +
+                "\"=? AND \"" + CurrencyValueCrudOperations.DATETIME_LABEL +
+                "\" <= ? ORDER BY " + CurrencyValueCrudOperations.DATETIME_LABEL + "DESC LIMIT 1";
+        List<CurrencyValue> currencyValues= StatementWrapper.select(
+            query,
+            List.of(currencyId, datetime),
+            CurrencyValueCrudOperations::createInstance
+        );
+
+        if(currencyValues.isEmpty())
+            throw new CurrenyValueNotFoundException("The currency Values doesn't exist");
+
+        return currencyValues.get(0).getAmount();
     }
 }

@@ -3,6 +3,7 @@ package repository;
 import model.*;
 import model.Account;
 import repository.exception.CategoryNotFoundException;
+import repository.exception.CurrenyValueNotFoundException;
 import repository.exception.NotEnoughBalanceException;
 import repository.exception.SameAccountException;
 
@@ -21,6 +22,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     private static final TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
     private static final CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations();
     private static final TransferCrudOperations transferCrudOperations = new TransferCrudOperations();
+    private static final CurrencyValueCrudOperations currencyValueCrudOperations= new CurrencyValueCrudOperations();
     private final static String
         ID_LABEL="id",
         NAME_LABEL="name",
@@ -176,8 +178,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     }
 
     public Transfer doTransfert(String sourceId, String targetId, BigDecimal amount, String categoryId, String label)
-        throws SQLException, AccountNotFoundException, SameAccountException, CategoryNotFoundException, NotEnoughBalanceException
-    {
+            throws SQLException, AccountNotFoundException, SameAccountException, CategoryNotFoundException, NotEnoughBalanceException, CurrenyValueNotFoundException {
         if(sourceId.equals(targetId))
             throw new SameAccountException("The source and destination account be the same");
         Account source = findById(sourceId);
@@ -190,6 +191,11 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         Category category = categoryCrudOperations.findById(categoryId);
         if(category == null)
             throw new CategoryNotFoundException("The category doesn't exist");
+
+
+        if(!target.getCurrency().getId().equals(source.getCurrency().getId())){
+            amount = amount.multiply(currencyCrudOperations.getValueInDate(target.getCurrency().getId(), LocalDateTime.now()));
+        }
 
         LocalDateTime dateTime = LocalDateTime.now();
         Transaction srcTransaction = new Transaction(

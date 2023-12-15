@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class CurrencyValue {
     private String id;
-    private LocalDateTime dateTime;
+    private LocalDateTime effectiveDatetime;
     private BigDecimal amount;
     private Currency source, destination;
 }

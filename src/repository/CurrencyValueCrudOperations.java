@@ -33,7 +33,7 @@ public class CurrencyValueCrudOperations implements CrudOperations<CurrencyValue
             columns.add(DEST_LABEL);
         if(currencyValue.getSource() != null && currencyValue.getSource().getId() != null)
             columns.add(SRC_LABEL);
-        if(currencyValue.getDateTime() != null)
+        if(currencyValue.getEffectiveDatetime() != null)
             columns.add(DATETIME_LABEL);
         if(currencyValue.getAmount() != null)
             columns.add(AMOUNT_LABEL);
@@ -71,7 +71,7 @@ public class CurrencyValueCrudOperations implements CrudOperations<CurrencyValue
         List<Object> values = new ArrayList<>();
         values.add(toSave.getDestination() != null ? toSave.getDestination().getId() : null);
         values.add(toSave.getSource() != null ? toSave.getSource().getId() : null);
-        values.add(toSave.getDateTime());
+        values.add(toSave.getEffectiveDatetime());
         values.add(toSave.getAmount());
         values.add(toSave.getId());
 
