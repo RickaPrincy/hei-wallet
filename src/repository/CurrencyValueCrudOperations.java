@@ -12,11 +12,12 @@ public class CurrencyValueCrudOperations implements CrudOperations<CurrencyValue
             AMOUNT_LABEL = "amount",
             DATETIME_LABEL="effective_date",
             SRC_LABEL= "source",
-            DEST_LABEL= "destination";
+            DEST_LABEL= "destination",
+            ID_LABEL="id";
     public static CurrencyValue createInstance(ResultSet resultSet){
         try {
             return new CurrencyValue(
-                resultSet.getString(Query.ID_LABEL),
+                resultSet.getString(ID_LABEL),
                 resultSet.getTimestamp(DATETIME_LABEL).toLocalDateTime(),
                 resultSet.getBigDecimal(AMOUNT_LABEL),
                 currencyCrudOperations.findById(resultSet.getString(SRC_LABEL)),

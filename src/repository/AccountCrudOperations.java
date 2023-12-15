@@ -2,9 +2,12 @@ package repository;
 
 import model.*;
 import model.Account;
+import repository.exception.CategoryNotFoundException;
+import repository.exception.NotEnoughBalanceException;
+import repository.exception.SameAccountException;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -17,6 +20,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     private static final BalanceCrudOperations balanceCrudOperations= new BalanceCrudOperations();
     private static final TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
     private static final CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations();
+    private static final TransferCrudOperations transferCrudOperations = new TransferCrudOperations();
     private final static String
         ID_LABEL="id",
         NAME_LABEL="name",
@@ -86,18 +90,17 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             toSave.setId(resultSet.getString(1));
         return toSave;
     }
-    public Account doTransaction(Transaction transaction, String accountId) throws SQLException {
+    public Account doTransaction(Transaction transaction, String accountId) throws SQLException, NotEnoughBalanceException {
         Account target = findById(accountId);
         if(target == null)
             return null;
         BigDecimal transactionValue = transaction.getType() == TransactionType.DEBIT ? transaction.getAmount().negate() : transaction.getAmount();
 
-        //TODO throw specifiq error
         if(target.getType() != AccountType.BANK
             && transaction.getType() == TransactionType.DEBIT
             && target.getBalance().getAmount().compareTo(transactionValue) < 0
         ){
-            return null;
+            throw new NotEnoughBalanceException("Cannot have negative money if account type is not BANK");
         }
 
         Balance newBalance = new Balance(null, transactionValue.add(target.getBalance().getAmount()), null);
@@ -170,5 +173,46 @@ public class AccountCrudOperations implements CrudOperations<Account> {
         return categorySums.entrySet()
             .stream().map(el -> new CategorySum(el.getKey(), el.getValue()))
             .collect(Collectors.toList());
+    }
+
+    public Transfer doTransfert(String sourceId, String targetId, BigDecimal amount, String categoryId, String label)
+        throws SQLException, AccountNotFoundException, SameAccountException, CategoryNotFoundException, NotEnoughBalanceException
+    {
+        if(sourceId.equals(targetId))
+            throw new SameAccountException("The source and destination account be the same");
+        Account source = findById(sourceId);
+        Account target = findById(targetId);
+        if(source == null)
+            throw new AccountNotFoundException("The Source account doesn't exist");
+        if(target == null)
+            throw new AccountNotFoundException("The destination account doesn't exist");
+
+        Category category = categoryCrudOperations.findById(categoryId);
+        if(category == null)
+            throw new CategoryNotFoundException("The category doesn't exist");
+
+        LocalDateTime dateTime = LocalDateTime.now();
+        Transaction srcTransaction = new Transaction(
+            null,
+            label,
+            amount,
+            LocalDateTime.now(),
+            TransactionType.DEBIT,
+            category
+        );
+
+        Transaction destTransaction = new Transaction(
+            null,
+            label,
+            amount,
+            LocalDateTime.now(),
+            TransactionType.CREDIT,
+            category
+        );
+
+        doTransaction(srcTransaction, sourceId);
+        doTransaction(destTransaction, targetId);
+        Transfer transfer = new Transfer(null,amount, dateTime,source, target);
+        return transferCrudOperations.save(transfer, categoryId);
     }
 }

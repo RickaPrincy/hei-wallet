@@ -4,6 +4,7 @@ import model.*;
 import repository.AccountCrudOperations;
 import repository.CategoryCrudOperations;
 import repository.CurrencyCrudOperations;
+import repository.exception.NotEnoughBalanceException;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -48,7 +49,7 @@ public class AccountTest {
         ), null));
     }
 
-    public static void doTransaction () throws SQLException {
+    public static void doTransaction () throws SQLException, NotEnoughBalanceException {
         System.out.println(accountCrudOperations.findById("account_id1"));
         Transaction transaction = new Transaction(null, "label_transaction", BigDecimal.valueOf(3000), null, TransactionType.DEBIT, categoryCrudOperations.findById("category_1"));
         System.out.println(accountCrudOperations.doTransaction(transaction, "account_id1"));
@@ -86,13 +87,26 @@ public class AccountTest {
 
     public static void getCategorySumWithJava() throws SQLException {
         accountCrudOperations.getCategorySumWithJava(
-            "account_id1",
-            LocalDate.of(2023,1,1),
-            LocalDate.now()
+                "account_id1",
+                LocalDate.of(2023, 1, 1),
+                LocalDate.now()
         ).forEach(System.out::println);
     }
 
-    public static void launch() throws SQLException {
+    public static void doTransfer(){
+        try{
+            System.out.println(accountCrudOperations.doTransfert(
+            "account_id1",
+            "account_id2",
+            BigDecimal.valueOf(10),
+            "category_1",
+            "Vola"
+            ));
+        }catch(Exception error){
+            System.out.println(error.getMessage());
+        }
+    }
+    public static void launch() throws SQLException, NotEnoughBalanceException {
         AccountTest.findAll();
         AccountTest.create();
         AccountTest.update();
