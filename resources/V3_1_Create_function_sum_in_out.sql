@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION sum_amount_in_out(
+CREATE OR REPLACE FUNCTION sum_in_out(
     "account_id" VARCHAR(255),
     "from" TIMESTAMP,
     "to" TIMESTAMP

@@ -35,7 +35,7 @@ public class AccountTest {
         System.out.println(accountRepository.saveAll(List.of(
             new Account(
                 null,
-                "name_insertd",
+                "name_inserted",
                 null,
                 AccountType.BANK,
                 new Currency("currency_ariary", null,null),
@@ -54,21 +54,21 @@ public class AccountTest {
         System.out.println(accountRepository.getBalance("account_id1", LocalDateTime.now()));
         System.out.println(accountRepository.getBalance(
             "account_id1",
-            LocalDateTime.of(2022,01,01, 01, 01,01)
+            LocalDateTime.of(2022,1,1, 1, 1,1)
         ));
     }
 
     public static void getBalanceInterval() throws SQLException {
         System.out.println(accountRepository.getBalanceInterval(
             "account_id1",
-            LocalDateTime.of(2022,01,01, 01, 01,01),
+            LocalDateTime.of(2022,1,1, 1, 1,1),
             LocalDateTime.now()
         ));
 
         System.out.println(accountRepository.getBalanceInterval(
             "account_id1",
-            LocalDateTime.of(2022,01,01, 01, 01,01),
-            LocalDateTime.of(2023,01,01, 01, 01,01)
+            LocalDateTime.of(2022,1,1, 1, 1,1),
+            LocalDateTime.of(2023,1,1, 1, 1,1)
         ));
     }
 
@@ -77,7 +77,7 @@ public class AccountTest {
     }
 
     public static void getCategorySum() throws SQLException {
-        accountRepository.getAllCategorySum("account_id",LocalDate.of(2023,01,01), LocalDate.now()).forEach(System.out::println);
+        accountRepository.getAllCategorySum("account_id",LocalDate.of(2023,1,1), LocalDate.now()).forEach(System.out::println);
     }
 
     public static void launch() throws SQLException {

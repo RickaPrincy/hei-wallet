@@ -1,6 +1,5 @@
 package mock.tests;
 
-import model.Category;
 import model.Transaction;
 import model.TransactionType;
 import repository.CategoryRepository;
@@ -12,8 +11,7 @@ import java.util.List;
 
 public class TransactionTest {
     private static final TransactionRepository transactionRepository = new TransactionRepository();
-    private static CategoryRepository categoryRepository = new CategoryRepository();
-    public static Category category;
+    private static final CategoryRepository categoryRepository = new CategoryRepository();
 
     public static void findAll() throws SQLException {
         System.out.println("\"Find all with no filters params: ");
@@ -29,7 +27,7 @@ public class TransactionTest {
                 BigDecimal.valueOf(250),
                 null,
                 TransactionType.CREDIT,
-                category
+                categoryRepository.findAll("WHERE \"id\"='category_1'").get(0)
             )
         ), "account_id1"));
     }
@@ -43,7 +41,7 @@ public class TransactionTest {
                 BigDecimal.valueOf(250),
                 null,
                 TransactionType.CREDIT,
-                category
+                categoryRepository.findAll("WHERE \"id\"='category_1'").get(0)
             )
         ), "account_id1"));
     }
