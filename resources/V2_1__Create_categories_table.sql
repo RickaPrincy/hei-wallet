@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS "category" (
     "id" VARCHAR(255) PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "name" VARCHAR(225) UNIQUE NOT NULL
+    "name" VARCHAR(225) UNIQUE NOT NULL,
+    "type" VARCHAR(225) NOT NULL 
 );
 
 INSERT INTO "category"
