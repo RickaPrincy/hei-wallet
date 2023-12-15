@@ -46,7 +46,7 @@ public class AccountTest {
     public static void doTransaction () throws SQLException {
         System.out.println(accountRepository.doTransaction("account_id1", new Transaction(
             null, "label_transaction", BigDecimal.valueOf(1000), null, TransactionType.CREDIT,
-            new Category("category_id1", null, null)
+            new Category("category_1", null, null)
         )));
     }
 
