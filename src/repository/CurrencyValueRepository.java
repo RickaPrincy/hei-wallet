@@ -2,12 +2,11 @@ package repository;
 
 import model.CurrencyValue;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class CurrencyValueRepository implements BasicRepository<CurrencyValue>{
+public class CurrencyValueRepository implements CrudOperations<CurrencyValue> {
     private static final CurrencyRepository currencyRepository= new CurrencyRepository();
     public final static String
             AMOUNT_LABEL = "amount",

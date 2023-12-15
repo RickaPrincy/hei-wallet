@@ -1,5 +1,6 @@
 package repository;
 
+import model.Category;
 import model.Transaction;
 import model.TransactionType;
 import model.Transfer;
@@ -9,13 +10,15 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class TransferRepository implements BasicRepository<Transfer>{
-    private static AccountRepository accountRepository = new AccountRepository();
+public class TransferRepository implements CrudOperations<Transfer> {
+    private static final AccountRepository accountRepository = new AccountRepository();
+    private static final CategoryRepository categoryRepository = new CategoryRepository();
     public final static String
         AMOUNT_LABEL= "amount",
         DATETIME_LABEL= "creation_datetime",
         DESTINATION_LABEL= "destination",
         SOURCE_LABEL= "source",
+        CATEGORY_LABEL= "category",
         TABLE_NAME="transfer";
     private static Transfer createInstance(ResultSet resultSet){
         try {
@@ -24,8 +27,8 @@ public class TransferRepository implements BasicRepository<Transfer>{
                 resultSet.getBigDecimal(AMOUNT_LABEL),
                 resultSet.getTimestamp(DATETIME_LABEL).toLocalDateTime(),
                 accountRepository.findAll(Map.of(Query.ID_LABEL, resultSet.getString(SOURCE_LABEL)),null).get(0),
-                accountRepository.findAll(Map.of(Query.ID_LABEL, resultSet.getString(DESTINATION_LABEL)),null).get(0)
-            );
+                accountRepository.findAll(Map.of(Query.ID_LABEL, resultSet.getString(DESTINATION_LABEL)),null).get(0),
+                categoryRepository.findAll(Map.of(Query.ID_LABEL, resultSet.getString(CATEGORY_LABEL)),null).get(0) );
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -89,8 +92,23 @@ public class TransferRepository implements BasicRepository<Transfer>{
 
         }
 */
-        Transaction srcTransaction = new Transaction(null, label, toSave.getAmount(), null,TransactionType.DEBIT);
-        Transaction destTransaction = new Transaction(null, label, toSave.getAmount(), null,TransactionType.CREDIT);
+        Category category = categoryRepository.findAll(Map.of(Query.ID_LABEL, toSave.getCategory().getId()), null).get(0);
+        Transaction srcTransaction = new Transaction(
+            null,
+            label,
+            toSave.getAmount(),
+            null,
+            TransactionType.DEBIT,
+            category
+        );
+        Transaction destTransaction = new Transaction(
+            null,
+            label,
+            toSave.getAmount(),
+            null,
+            TransactionType.CREDIT,
+            category
+        );
         QueryValues srcQuery = AccountRepository.balanceAndTransactionQuery(toSave.getSource(), srcTransaction);
         QueryValues dstQuery = AccountRepository.balanceAndTransactionQuery(toSave.getSource(), destTransaction);
         QueryValues transferQuery = updateQuery(toSave, null);
@@ -102,6 +120,7 @@ public class TransferRepository implements BasicRepository<Transfer>{
         values.addAll(dstQuery.getValues());
         values.addAll(transferQuery.getValues());
         ResultSet resultSet = StatementWrapper.update(query, values);
+
         if(resultSet.next()){
             toSave.setId(resultSet.getString(1));
         }

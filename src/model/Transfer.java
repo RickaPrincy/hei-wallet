@@ -15,4 +15,5 @@ public class Transfer {
     private BigDecimal amount;
     private LocalDateTime creationDatetime;
     private Account source, destination;
+    private Category category;
 }

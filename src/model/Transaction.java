@@ -16,4 +16,5 @@ public class Transaction {
     private BigDecimal amount;
     private LocalDateTime transactionDatetime;
     private TransactionType type;
+    private Category category;
 }

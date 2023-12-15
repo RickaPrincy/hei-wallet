@@ -7,7 +7,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class BalanceRepository implements BasicRepository<Balance>{
+public class BalanceRepository implements CrudOperations<Balance> {
     public final static String
         AMOUNT_LABEL = "balance",
         DATETIME_LABEL="creation_datetime",

@@ -1,7 +1,5 @@
 package repository;
 
-import model.Balance;
-import model.Currency;
 import model.Transaction;
 import model.TransactionType;
 
@@ -11,13 +9,15 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class TransactionRepository implements BasicRepository<Transaction>{
+public class TransactionRepository implements CrudOperations<Transaction> {
+    public static CategoryRepository categoryRepository = new CategoryRepository();
     public final static String
             LBL_LABEL = "label",
             AMOUNT_LABEL= "amount",
             DATETIME_LABEL= "transaction_datetime",
             ACCOUNT_LABEL= "account",
             TYPE_LABEL= "type",
+            CATEGORY_LABEL= "category",
             TABLE_NAME="transaction";
     private static Transaction createInstance(ResultSet resultSet){
         try {
@@ -26,7 +26,8 @@ public class TransactionRepository implements BasicRepository<Transaction>{
                 resultSet.getString(LBL_LABEL),
                 resultSet.getBigDecimal(AMOUNT_LABEL),
                 resultSet.getTimestamp(DATETIME_LABEL).toLocalDateTime(),
-                TransactionType.valueOf(resultSet.getString(TYPE_LABEL))
+                TransactionType.valueOf(resultSet.getString(TYPE_LABEL)),
+                categoryRepository.findAll(Map.of(Query.ID_LABEL, resultSet.getString(CATEGORY_LABEL)), null).get(0)
             );
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
@@ -45,7 +46,8 @@ public class TransactionRepository implements BasicRepository<Transaction>{
             ACCOUNT_LABEL, meta,
             LBL_LABEL, transaction.getLabel(),
             TYPE_LABEL, transaction.getType(),
-            DATETIME_LABEL, Timestamp.valueOf(LocalDateTime.now())
+            DATETIME_LABEL, Timestamp.valueOf(LocalDateTime.now()),
+            CATEGORY_LABEL, transaction.getCategory().getId()
         ));
 
         if(transaction.getId() != null){

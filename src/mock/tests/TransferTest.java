@@ -1,14 +1,13 @@
 package mock.tests;
 
 import model.Account;
-import model.Balance;
+import model.Category;
 import model.Transfer;
 import repository.AccountRepository;
 import repository.TransferRepository;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
 
 public class TransferTest {
     private static final TransferRepository transferRepository = new TransferRepository();
@@ -26,7 +25,8 @@ public class TransferTest {
                 BigDecimal.valueOf(251),
                 null,
                 accountRepository.findAll("WHERE \"id\"='account_id1'").get(0),
-                accountRepository.findAll("WHERE \"id\"='account_id2'").get(0)
+                accountRepository.findAll("WHERE \"id\"='account_id2'").get(0),
+                new Category("category_id1", null, null)
             )
         , "mon label"));
     }
@@ -40,7 +40,8 @@ public class TransferTest {
                 BigDecimal.valueOf(252),
                 null,
                 accountRepository.findAll("WHERE \"id\"='account_id1'").get(0),
-                accountRepository.findAll("WHERE \"id\"='account_id2'").get(0)
+                accountRepository.findAll("WHERE \"id\"='account_id2'").get(0),
+                new Category("category_id1", null, null)
             )
         , "mon label"));
     }
@@ -55,7 +56,8 @@ public class TransferTest {
                 BigDecimal.valueOf(500),
                 null,
                 source,
-                dest
+                dest,
+                new Category("category_id1", null, null)
             )
         , "mon label"));
     }

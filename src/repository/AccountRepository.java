@@ -9,9 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class AccountRepository implements BasicRepository<Account>{
+public class AccountRepository implements CrudOperations<Account> {
     private static final CurrencyRepository currencyRepository = new CurrencyRepository();
     private static final BalanceRepository balanceRepository= new BalanceRepository();
     private static final TransactionRepository transactionRepository = new TransactionRepository();
