@@ -11,6 +11,5 @@ BEGIN
     FROM "transaction"
     WHERE "account" = account_id
         AND transaction_datetime BETWEEN "from" AND "to";
-
     RETURN result;
 END $$;

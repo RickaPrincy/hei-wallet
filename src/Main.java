@@ -1,21 +1,26 @@
 import mock.tests.*;
-import model.CurrencyValue;
-import repository.AccountRepository;
-import repository.CategoryRepository;
-import repository.CurrencyValueRepository;
+import repository.*;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        CategoryRepository categoryRepository = new CategoryRepository();
-        categoryRepository.findAll().forEach(System.out::println);
+/*
+        //category test
+        CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations();
+        categoryCrudOperations.findAll().forEach(System.out::println);
+        System.out.println(categoryCrudOperations.findById("category_1"));
 
-        CurrencyValueRepository currencyValueRepository = new CurrencyValueRepository();
-        currencyValueRepository.findAll().forEach(System.out::println);
+        //currency value
+        CurrencyCrudOperations currencyCrudOperations= new CurrencyCrudOperations();
+        currencyCrudOperations.findAll().forEach(System.out::println);
+        System.out.println(currencyCrudOperations.findById("currency_ariary"));
 
-        CurrencyTest.launch();
+        //currency_value test
+        CurrencyValueCrudOperations currencyValueCrudOperations= new CurrencyValueCrudOperations();
+        currencyValueCrudOperations.findAll().forEach(System.out::println);
+        System.out.println(currencyValueCrudOperations.findById("currency_value1"));
+*/
         BalanceTest.launch();
         TransactionTest.launch();
         AccountTest.launch();

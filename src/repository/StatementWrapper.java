@@ -1,11 +1,10 @@
 package repository;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -14,9 +13,12 @@ public class StatementWrapper {
     public static PreparedStatement prepared(String query, List<Object> values) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
         if(values != null){
-            for(int i = 1; i <= values.size(); i++){
-                Object current = values.get(i -1);
-                if(current.getClass().isEnum()){
+            List<Object> filteredValues = values.stream().filter(Objects::nonNull).toList();
+            for(int i = 1; i <= filteredValues.size(); i++){
+                Object current = filteredValues.get(i -1);
+                if(current instanceof LocalDateTime){
+                    statement.setTimestamp(i, Timestamp.valueOf((LocalDateTime) current));
+                }else if(current.getClass().isEnum()){
                     statement.setObject(i, current, Types.OTHER);
                 }else{
                     statement.setObject(i, current);

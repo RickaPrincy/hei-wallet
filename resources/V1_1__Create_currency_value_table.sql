@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "currency_value" (
     "source" VARCHAR(255) REFERENCES "currency"("id") NOT NULL,
     "destination" VARCHAR(255) REFERENCES "currency"("id") NOT NULL,
     "amount" DECIMAL(18,5) DEFAULT 0 NOT NULL,
-    "effective_date" DATE DEFAULT CURRENT_DATE
+    "effective_date" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 INSERT INTO "currency_value"
 SELECT 'history_entry_2', 2000.00000, '2023-12-08T12:00:00Z', 'account_id2'
