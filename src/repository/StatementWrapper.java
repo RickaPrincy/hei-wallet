@@ -10,8 +10,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class StatementWrapper {
-    private static final Connection connection = PostgresqlConnection.getConnection();
     public static PreparedStatement prepared(String query, List<Object> values) throws SQLException {
+        Connection connection = PostgresqlConnection.getConnection();
         PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
         if(values != null){
             List<Object> filteredValues = values.stream().filter(Objects::nonNull).toList();
@@ -32,13 +32,17 @@ public class StatementWrapper {
     }
 
     public static <T> List<T> select(String query, List<Object> values, Function<ResultSet, T> mapper) throws SQLException {
-        return StatementWrapper.mapResultSet(prepared(query, values).executeQuery(), mapper);
+        List<T> result = StatementWrapper.mapResultSet(prepared(query, values).executeQuery(), mapper);
+        PostgresqlConnection.closeConnection();
+        return result;
     }
 
     public static ResultSet update(String query, List<Object> values) throws SQLException {
         PreparedStatement statement = prepared(query, values);
         statement.executeUpdate();
-        return statement.getGeneratedKeys();
+        ResultSet resultSet = statement.getGeneratedKeys();
+        PostgresqlConnection.closeConnection();
+        return resultSet;
     }
 
     public static <T> List<T> mapResultSet(ResultSet resultSet, Function<ResultSet, T> mapper) throws SQLException {

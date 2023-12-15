@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "category" (
     "id" VARCHAR(255) PRIMARY KEY DEFAULT uuid_generate_v4(),
     "name" VARCHAR(225) UNIQUE NOT NULL,
-    "type""category_type" VARCHAR(225) NOT NULL 
+    "type" "category_type" VARCHAR(225) NOT NULL
 );
 
 INSERT INTO "category"
@@ -10,7 +10,7 @@ SELECT
 WHERE NOT EXISTS (
     SELECT 1 FROM "category"
     WHERE
-        "id" = 'category_4' AND "name" = 'Food' AND "type_category" = 'DEBIT'
+        "id" = 'category_4' AND "name" = 'Food' AND "type" = 'DEBIT'
 );
 
 INSERT INTO "category" ("id", "name", "type")
@@ -19,7 +19,7 @@ SELECT
 WHERE NOT EXISTS (
     SELECT 1 FROM "category"
     WHERE
-        "id" = 'category_5' AND "name" = 'Coffee' AND "type_category" = 'DEBIT'
+        "id" = 'category_5' AND "name" = 'Coffee' AND "type" = 'DEBIT'
 );
 INSERT INTO "category"
 SELECT

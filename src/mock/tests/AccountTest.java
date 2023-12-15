@@ -95,7 +95,7 @@ public class AccountTest {
 
     public static void doTransfer(){
         try{
-            System.out.println(accountCrudOperations.doTransfert(
+            System.out.println(accountCrudOperations.doTransfer(
             "account_id1",
             "account_id2",
             BigDecimal.valueOf(10),

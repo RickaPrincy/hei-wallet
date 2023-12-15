@@ -22,7 +22,6 @@ public class AccountCrudOperations implements CrudOperations<Account> {
     private static final TransactionCrudOperations transactionCrudOperations = new TransactionCrudOperations();
     private static final CategoryCrudOperations categoryCrudOperations = new CategoryCrudOperations();
     private static final TransferCrudOperations transferCrudOperations = new TransferCrudOperations();
-    private static final CurrencyValueCrudOperations currencyValueCrudOperations= new CurrencyValueCrudOperations();
     private final static String
         ID_LABEL="id",
         NAME_LABEL="name",
@@ -177,7 +176,7 @@ public class AccountCrudOperations implements CrudOperations<Account> {
             .collect(Collectors.toList());
     }
 
-    public Transfer doTransfert(String sourceId, String targetId, BigDecimal amount, String categoryId, String label)
+    public Transfer doTransfer(String sourceId, String targetId, BigDecimal amount, String categoryId, String label)
             throws SQLException, AccountNotFoundException, SameAccountException, CategoryNotFoundException, NotEnoughBalanceException, CurrenyValueNotFoundException {
         if(sourceId.equals(targetId))
             throw new SameAccountException("The source and destination account be the same");
