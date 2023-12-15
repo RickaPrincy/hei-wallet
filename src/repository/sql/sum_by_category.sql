@@ -1,7 +1,7 @@
-CREATE OR REPLACE FUNCTION calculate_category_sums(
+CREATE OR REPLACE FUNCTION sum_in_out_by_category(
     "account_id" VARCHAR(255),
-    "start_date" TIMESTAMP,
-    "end_date" TIMESTAMP
+    "from" TIMESTAMP,
+    "to" TIMESTAMP
 ) RETURNS TABLE (category_name VARCHAR(255), total_amount DECIMAL(18,5)) AS $$
 BEGIN
     RETURN QUERY
@@ -11,8 +11,8 @@ BEGIN
     FROM
         category c
     LEFT JOIN
-        "transaction" t ON c.id = t.category_id AND t.account = account_id
-                          AND t.transaction_datetime BETWEEN start_date AND end_date
+        "transaction" t ON c.id = t.category AND t.account = account_id
+              AND t.transaction_datetime BETWEEN "from" AND "to"
     GROUP BY
         c.name;
-END $$;
+END; $$ LANGUAGE plpgsql;
