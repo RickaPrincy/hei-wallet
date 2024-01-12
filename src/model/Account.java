@@ -1,15 +1,14 @@
 package model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+@NoArgsConstructor
+@Getter
+@Setter
+public class Account{
     private String id;
     private String name;
     private Balance balance;

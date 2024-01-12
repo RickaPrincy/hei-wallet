@@ -12,4 +12,4 @@ BEGIN
     WHERE "account" = account_id
         AND transaction_datetime BETWEEN "from" AND "to";
     RETURN result;
-END $$;
+END $$ END $$ LANGUAGE plpgsql;
