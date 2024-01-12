@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/hei_wallet</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="hei_wallet@localhost [2]" uuid="4ae4fd0a-8fac-4f80-97e9-61fa6816d9d9">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/hei_wallet</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
