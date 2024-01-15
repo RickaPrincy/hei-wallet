@@ -1,5 +1,6 @@
 package repository;
 
+import fjpa.FJPARepository;
 import lombok.AllArgsConstructor;
 import model.Category;
 import model.CategoryType;
@@ -9,9 +10,12 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
-public class CategoryCrudOperations implements CrudOperations<Category> {
+public class CategoryCrudOperations extends FJPARepository<Category> {
     public final static String ID_LABEL="id", NAME_LABEL = "name", TYPE_LABEL = "type";
+
+    public CategoryCrudOperations() {
+        super(Category.class);
+    }
 
     private static Category createInstance(ResultSet resultSet) {
         try {
@@ -33,13 +37,6 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
         return columns.stream().map(el -> "\"" + el + "\" = ?").collect(Collectors.joining(", "));
     }
 
-    @Override
-    public List<Category> findAll() throws SQLException {
-        String query = "SELECT * FROM \"category\"";
-        return StatementWrapper.select(query, null, CategoryCrudOperations::createInstance);
-    }
-
-    @Override
     public Category findById(String id) throws SQLException {
         String query = "SELECT * FROM \"category\" WHERE \"id\"=?";
         List<Category> lists = StatementWrapper.select(query, List.of(id), CategoryCrudOperations::createInstance);
@@ -47,7 +44,6 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
             return null;
         return lists.get(0);
     }
-    @Override
     public List<Category> saveAll(List<Category> toSave, String meta) throws SQLException {
         List<Category> result = new ArrayList<>();
         for (Category category : toSave) {
@@ -57,7 +53,6 @@ public class CategoryCrudOperations implements CrudOperations<Category> {
         return result;
     }
 
-    @Override
     public Category save(Category toSave, String meta) throws SQLException {
         String saveQuery= "INSERT INTO \"category\" (\"name\",\"type\") VALUES (?, ?);";
         String updateQuery= "UPDATE \"category\" SET " + createUpdateQuery(toSave) + " WHERE \"id\"= ?";
