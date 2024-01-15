@@ -82,7 +82,8 @@ public class ReflectModel<T>{
             Attribute attribute = new Attribute(
                 clAnnotation.columnName().isEmpty() ? field.getName().toLowerCase() : clAnnotation.columnName(),
                 field.getName().toLowerCase(),
-                clAnnotation.required()
+                clAnnotation.required(),
+                field.getType()
             );
             attributes.add(attribute);
         }
