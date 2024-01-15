@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 public class Category {
-    @Column(required = false, columnName = "ricka")
+    @Column
     private String id;
 
     @Column
