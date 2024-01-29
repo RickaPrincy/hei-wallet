@@ -2,6 +2,7 @@ package model;
 
 import fjpa.annotation.Column;
 import fjpa.annotation.Entity;
+import fjpa.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 public class Category {
+    @Id
     @Column
     private String id;
 

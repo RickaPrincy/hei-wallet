@@ -1,7 +1,6 @@
 package repository;
 
 import fjpa.FJPARepository;
-import lombok.AllArgsConstructor;
 import model.Category;
 import model.CategoryType;
 
