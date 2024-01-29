@@ -30,19 +30,23 @@ public class FJPARepository <T> extends ReflectModel<T>{
         if(isCreate){
             query = "INSERT INTO " + getTableName()
                     + " (" + joinAttributesNamesWithoutId(",")
-                    + ") VALUES ( ? " + " , ? ".repeat(getAttributes().size() - 1) + " );";
+                    + ") VALUES ( ? " + " , ? ".repeat(getAttributes().size() - 2) + " );";
         }else{
             query = "UPDATE " + getTableName()
                     + " SET " + joinAttributesNamesWithoutId(" = ? , ")
                     + " = ? WHERE " + idAttribute.getColumnName() + " = ?";
         }
 
+        System.out.println(query);
         List<Object> values = getAttributes()
                 .stream()
                 .filter(el -> !el.equals(idAttribute))
                 .map(el -> getAttributeValue(toSave, el))
                 .collect(Collectors.toList());
-        values.add(getAttributeValue(toSave, idAttribute));
+
+        if(!isCreate){
+            values.add(getAttributeValue(toSave, idAttribute));
+        }
 
         ResultSet resultSet = StatementWrapper.update(query, values);
         if(!resultSet.next())
