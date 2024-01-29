@@ -8,8 +8,8 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws SQLException {
         final Category category = new Category(
-            "category_1",
-            "name_updated" ,
+                "category_1",
+            "nam_inseted" ,
             CategoryType.ALL
         );
 
