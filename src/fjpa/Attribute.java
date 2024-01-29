@@ -1,14 +1,12 @@
 package fjpa;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Attribute {
     private String columnName;
     private String fieldName;

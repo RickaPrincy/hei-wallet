@@ -2,32 +2,13 @@ package fjpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FJPARepository <T> extends ReflectModel<T>{
     public FJPARepository(Class<T> type) {
         super(type);
-    }
-
-    public T mapResultSetToInstance(ResultSet resultSet){
-        Map<String, Object> values = new HashMap<>();
-        getAttributes().forEach(attribute ->{
-            try {
-                Object value;
-                if (attribute.getFieldType().isEnum()) {
-                    String enumString = resultSet.getString(attribute.getColumnName());
-                    value = Enum.valueOf((Class<Enum>) attribute.getFieldType(), enumString);
-                } else {
-                    value = resultSet.getObject(attribute.getColumnName());
-                }
-                values.put(attribute.getFieldName(), value);
-            } catch (SQLException e) {
-                throw new RuntimeException("Failed to map resultSet");
-            }
-        });
-        return createInstance(values);
     }
 
     public List<T> findAll() throws SQLException {
@@ -41,5 +22,39 @@ public class FJPARepository <T> extends ReflectModel<T>{
         if(lists.isEmpty())
             return null;
         return lists.get(0);
+    }
+
+    public T save(T toSave) throws SQLException {
+        final boolean isCreate = getAttributeValue(toSave, idAttribute) == null;
+        String query = "";
+        if(isCreate){
+            query = "INSERT INTO " + getTableName()
+                    + " (" + joinAttributesNamesWithoutId(",")
+                    + ") VALUES ( ? " + " , ? ".repeat(getAttributes().size() - 1) + " );";
+        }else{
+            query = "UPDATE " + getTableName()
+                    + " SET " + joinAttributesNamesWithoutId(" = ? , ")
+                    + " = ? WHERE " + idAttribute.getColumnName() + " = ?";
+        }
+
+        List<Object> values = getAttributes()
+                .stream()
+                .filter(el -> !el.equals(idAttribute))
+                .map(el -> getAttributeValue(toSave, el))
+                .collect(Collectors.toList());
+        values.add(getAttributeValue(toSave, idAttribute));
+
+        ResultSet resultSet = StatementWrapper.update(query, values);
+        if(!resultSet.next())
+            return null;
+        return mapResultSetToInstance(resultSet);
+    }
+
+    public List<T> saveAll(List<T> toSaves) throws SQLException {
+        List<T> result = new ArrayList<>();
+        for(T toSave: toSaves){
+            result.add(save(toSave));
+        }
+        return result;
     }
 }

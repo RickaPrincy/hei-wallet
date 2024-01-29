@@ -10,10 +10,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Used to get metadata about the generic class
@@ -99,5 +99,43 @@ public class ReflectModel<T>{
             attributes.add(attribute);
         }
         return attributes;
+    }
+
+    public String joinAttributesNamesWithoutId(String limiter){
+        return getAttributes()
+                .stream()
+                .filter(el -> !idAttribute.equals(el))
+                .map(Attribute::getColumnName)
+                .collect(Collectors.joining(limiter));
+    }
+    public Object getAttributeValue(T object, Attribute attribute) {
+        String columnName = attribute.getFieldName();
+        try {
+            String methodName = "get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1);
+            Method method = object.getClass().getMethod(methodName);
+            return method.invoke(object);
+        }
+        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException("Getter error for " + columnName);
+        }
+    }
+
+    protected T mapResultSetToInstance(ResultSet resultSet){
+        Map<String, Object> values = new HashMap<>();
+        getAttributes().forEach(attribute ->{
+            try {
+                Object value;
+                if (attribute.getFieldType().isEnum()) {
+                    String enumString = resultSet.getString(attribute.getColumnName());
+                    value = Enum.valueOf((Class<Enum>) attribute.getFieldType(), enumString);
+                } else {
+                    value = resultSet.getObject(attribute.getColumnName());
+                }
+                values.put(attribute.getFieldName(), value);
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to map resultSet");
+            }
+        });
+        return createInstance(values);
     }
 }
