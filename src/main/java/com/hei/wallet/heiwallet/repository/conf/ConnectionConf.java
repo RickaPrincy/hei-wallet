@@ -1,23 +1,26 @@
 package com.hei.wallet.heiwallet.repository.conf;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+@Configuration
 public class ConnectionConf {
-    final public static String DB_URL = System.getenv("DB_URL");
-    final public static String DB_PASSWORD = System.getenv("DB_PASSWORD");
-    final public static String DB_USERNAME = System.getenv("DB_USERNAME");
+    private final ConnectionProperties connectionProperties;
 
     @Bean
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(
-                DB_URL,
-                DB_USERNAME,
-                DB_PASSWORD
+                this.connectionProperties.getUrl(),
+                this.connectionProperties.getUsername(),
+                this.connectionProperties.getPassword()
         );
     }
 
+    public ConnectionConf(ConnectionProperties connectionProperties) {
+        this.connectionProperties = connectionProperties;
+    }
 }
