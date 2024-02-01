@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -21,11 +22,8 @@ import java.util.stream.Collectors;
 public class ReflectModel<T>{
     protected Class<T> type;
     public Attribute idAttribute;
-
     public final String tableName;
-
     public final List<Attribute> attributes;
-
     public ReflectModel(Class<T> type) {
         this.type = type;
         this.tableName = getReflectedTableName();
@@ -125,7 +123,9 @@ public class ReflectModel<T>{
                 Object value;
                 if(Instant.class.equals(attribute.getFieldType())){
                     value = resultSet.getTimestamp(attribute.getColumnName()).toInstant();
-                }else if (attribute.getFieldType().isEnum()) {
+                }else if(BigDecimal.class.equals(attribute.getFieldType())){
+                    value = resultSet.getBigDecimal(attribute.getColumnName());
+                } else if (attribute.getFieldType().isEnum()) {
                     String enumString = resultSet.getString(attribute.getColumnName());
                     value = Enum.valueOf((Class<Enum>) attribute.getFieldType(), enumString);
                 } else {

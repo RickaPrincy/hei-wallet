@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface ManyToOne {
     Class<?> target();
-    String name();
+    String columnName() default "";
 }

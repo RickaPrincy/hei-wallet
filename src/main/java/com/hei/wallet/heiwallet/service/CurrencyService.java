@@ -1,9 +1,7 @@
 package com.hei.wallet.heiwallet.service;
 
 import com.hei.wallet.heiwallet.exception.InternalServerErrorException;
-import com.hei.wallet.heiwallet.model.Category;
 import com.hei.wallet.heiwallet.model.Currency;
-import com.hei.wallet.heiwallet.repository.CategoryRepository;
 import com.hei.wallet.heiwallet.repository.CurrencyRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +20,9 @@ public class CurrencyService {
         }
     }
 
-    public List<Currency> saveOrUpdateAll(List<Currency> categories){
+    public List<Currency> saveOrUpdateAll(List<Currency> currencies){
         try {
-            return currencyRepository.saveOrUpdateAll(categories);
+            return currencyRepository.saveOrUpdateAll(currencies);
         } catch (SQLException e) {
             throw new InternalServerErrorException();
         }

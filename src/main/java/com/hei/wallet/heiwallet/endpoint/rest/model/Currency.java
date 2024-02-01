@@ -1,7 +1,5 @@
 package com.hei.wallet.heiwallet.endpoint.rest.model;
 
-import org.springframework.lang.NonNull;
-
 import java.io.Serializable;
 
 public class Currency implements Serializable {

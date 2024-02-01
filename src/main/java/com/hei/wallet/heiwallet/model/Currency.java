@@ -1,10 +1,10 @@
 package com.hei.wallet.heiwallet.model;
 
-import com.hei.wallet.heiwallet.fjpa.annotation.Column;
-import com.hei.wallet.heiwallet.fjpa.annotation.Entity;
-import com.hei.wallet.heiwallet.fjpa.annotation.Id;
+import com.hei.wallet.heiwallet.fjpa.annotation.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -19,6 +19,9 @@ public class Currency implements Serializable {
     @Column
     private String code;
 
+    @OneToMany(target = CurrencyValue.class, mappedBy = "currency")
+    private List<CurrencyValue> currencyValues = new ArrayList<>();
+
     public Currency() {
     }
 
@@ -26,6 +29,14 @@ public class Currency implements Serializable {
         this.id = id;
         this.name = name;
         this.code = code;
+    }
+
+    public List<CurrencyValue> getCurrencyValues() {
+        return currencyValues;
+    }
+
+    public void setCurrencyValues(List<CurrencyValue> currencyValues) {
+        this.currencyValues = currencyValues;
     }
 
     public String getId() {
