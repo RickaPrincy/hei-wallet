@@ -6,7 +6,7 @@ import com.hei.wallet.heiwallet.fjpa.annotation.Id;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity(tableName = "balance_history")
@@ -19,12 +19,12 @@ public class Balance implements Serializable {
     private BigDecimal amount;
 
     @Column(columnName = "creation_datetime")
-    private LocalDateTime creationDatetime;
+    private Instant creationDatetime;
 
     @Column(columnName = "account")
     private String accountId;
 
-    public Balance(String id, BigDecimal amount, LocalDateTime creationDatetime, String accountId) {
+    public Balance(String id, BigDecimal amount, Instant creationDatetime, String accountId) {
         this.id = id;
         this.amount = amount;
         this.creationDatetime = creationDatetime;
@@ -42,7 +42,7 @@ public class Balance implements Serializable {
         return amount;
     }
 
-    public LocalDateTime getCreationDatetime() {
+    public Instant getCreationDatetime() {
         return creationDatetime;
     }
 
@@ -58,7 +58,7 @@ public class Balance implements Serializable {
         this.amount = amount;
     }
 
-    public void setCreationDatetime(LocalDateTime creationDatetime) {
+    public void setCreationDatetime(Instant creationDatetime) {
         this.creationDatetime = creationDatetime;
     }
 

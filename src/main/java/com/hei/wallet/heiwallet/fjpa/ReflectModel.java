@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,19 +29,15 @@ public class ReflectModel<T>{
     public ReflectModel(Class<T> type) {
         this.type = type;
         this.tableName = getReflectedTableName();
-        this.attributes = geTtReflectedAttributes();
+        this.attributes = getReflectedAttributes();
     }
 
     public T createInstance(Map<String, Object> argsValues) {
-        //TODO: refactor using findFirst
-        List<Constructor<T>> constructors =
-            Arrays.stream((Constructor<T>[]) type.getDeclaredConstructors())
+        Constructor<T> constructor = Arrays.stream((Constructor<T>[]) type.getDeclaredConstructors())
                 .filter(el -> el.getParameterCount() == 0)
-                .toList();
-        if(constructors.isEmpty())
-            throw new RuntimeException("Entity must have no args constructor");
+                .findFirst().orElseThrow(RuntimeException::new);
         try{
-            T newInstance = constructors.get(0).newInstance();
+            T newInstance = constructor.newInstance();
             newInstance = setFields(newInstance, argsValues);
             return newInstance;
         }catch(InvocationTargetException | InstantiationException | IllegalAccessException error){
@@ -71,7 +68,7 @@ public class ReflectModel<T>{
         return entity.tableName().isEmpty() ? type.getSimpleName().toLowerCase() : entity.tableName();
     }
 
-    private List<Attribute> geTtReflectedAttributes(){
+    private List<Attribute> getReflectedAttributes(){
         List<Attribute> attributes = new ArrayList<>();
         Field[] fields = Arrays.stream(type.getDeclaredFields())
             .filter(field -> field.isAnnotationPresent(Column.class))
@@ -126,7 +123,9 @@ public class ReflectModel<T>{
         getAttributes().forEach(attribute ->{
             try {
                 Object value;
-                if (attribute.getFieldType().isEnum()) {
+                if(Instant.class.equals(attribute.getFieldType())){
+                    value = resultSet.getTimestamp(attribute.getColumnName()).toInstant();
+                }else if (attribute.getFieldType().isEnum()) {
                     String enumString = resultSet.getString(attribute.getColumnName());
                     value = Enum.valueOf((Class<Enum>) attribute.getFieldType(), enumString);
                 } else {

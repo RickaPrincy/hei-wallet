@@ -11,7 +11,7 @@ import java.util.List;
 public class HealthController {
     private final HealthService healthService;
 
-    @GetMapping("dummy-table")
+    @GetMapping("/dummy-table")
     public List<Dummy> getDummies(){
         return healthService.getAllDummies();
     }
