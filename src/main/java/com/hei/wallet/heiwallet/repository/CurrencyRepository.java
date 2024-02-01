@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class CurrencyRepository extends FJPARepository<Currency> {
-    public CurrencyRepository(StatementWrapper statementWrapper) {
+    public CurrencyRepository(StatementWrapper statementWrapper){
         super(Currency.class, statementWrapper);
     }
 }

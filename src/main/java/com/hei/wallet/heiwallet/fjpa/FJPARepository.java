@@ -28,13 +28,13 @@ public class FJPARepository <T> extends ReflectModel<T> implements BasicCrudOper
 
     @Override
     public T findById(Object id) throws SQLException {
-        List<T> lists = findByField(idAttribute.getFieldName(), id);
+        List<T> lists = findByField(getIdAttribute().getFieldName(), id);
         return lists.isEmpty() ? null : lists.get(0);
     }
 
     @Override
     public T saveOrUpdate(T toSave) throws SQLException {
-        final Object idValue = getAttributeValue(toSave, idAttribute);
+        final Object idValue = getAttributeValue(toSave, getIdAttribute());
         if(idValue == null)
             return null;
 
@@ -48,7 +48,7 @@ public class FJPARepository <T> extends ReflectModel<T> implements BasicCrudOper
         }else{
             query = "UPDATE " + getTableName()
                     + " SET " + joinAttributesNamesWithoutId(" = ? , ")
-                    + " = ? WHERE " + idAttribute.getColumnName() + " = ?";
+                    + " = ? WHERE " + this.getIdAttribute().getColumnName() + " = ?";
         }
 
         List<Object> values;
@@ -60,10 +60,10 @@ public class FJPARepository <T> extends ReflectModel<T> implements BasicCrudOper
         }else{
             values = getAttributes()
                 .stream()
-                    .filter(el -> !el.equals(idAttribute))
+                    .filter(el -> !el.equals(getIdAttribute()))
                     .map(el -> getAttributeValue(toSave, el))
                     .collect(Collectors.toList());
-            values.add(getAttributeValue(toSave, idAttribute));
+            values.add(getAttributeValue(toSave, getIdAttribute()));
         }
 
         ResultSet resultSet = statementWrapper.update(query, values);

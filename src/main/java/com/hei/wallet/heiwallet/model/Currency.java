@@ -19,7 +19,6 @@ public class Currency implements Serializable {
     @Column
     private String code;
 
-    @OneToMany(target = CurrencyValue.class, mappedBy = "currency")
     private List<CurrencyValue> currencyValues = new ArrayList<>();
 
     public Currency() {

@@ -3,6 +3,7 @@ package com.hei.wallet.heiwallet.fjpa;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,10 +23,8 @@ public class StatementWrapper {
         List<Object> filteredValues = values.stream().filter(Objects::nonNull).toList();
         for(int i = 1; i <= filteredValues.size(); i++){
             Object current = filteredValues.get(i -1);
-            if(current instanceof LocalDate){
-                statement.setDate(i, Date.valueOf((LocalDate) current));
-            } else if(current instanceof LocalDateTime){
-                statement.setTimestamp(i, Timestamp.valueOf((LocalDateTime) current));
+            if(current instanceof Instant){
+                statement.setTimestamp(i, Timestamp.from((Instant) current));
             }else if(current.getClass().isEnum()){
                 statement.setObject(i, current, Types.OTHER);
             }else{

@@ -12,16 +12,18 @@ public class CurrencyValue implements Serializable {
     @Column
     private String id;
 
-    @Column(columnName = "effective_name")
+    @Column(columnName = "effective_date")
     private Instant effectiveDatetime;
 
     @Column
     private BigDecimal amount;
 
-    @ManyToOne(target = CurrencyValue.class)
+    @Column
+    @Relation
     private Currency source;
 
-    @ManyToOne(target = CurrencyValue.class)
+    @Column
+    @Relation
     private Currency destination;
 
     public CurrencyValue(String id, Instant effectiveDatetime, BigDecimal amount, Currency source, Currency destination) {
@@ -73,5 +75,16 @@ public class CurrencyValue implements Serializable {
 
     public void setDestination(Currency destination) {
         this.destination = destination;
+    }
+
+    @Override
+    public String toString() {
+        return "CurrencyValue{" +
+                "id='" + id + '\'' +
+                ", effectiveDatetime=" + effectiveDatetime +
+                ", amount=" + amount +
+                ", source=" + source +
+                ", destination=" + destination +
+                '}';
     }
 }

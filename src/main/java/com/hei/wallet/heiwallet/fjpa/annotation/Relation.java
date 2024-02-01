@@ -7,7 +7,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface OneToMany {
-    Class<?> target();
-    String mappedBy();
+public @interface Relation {
 }

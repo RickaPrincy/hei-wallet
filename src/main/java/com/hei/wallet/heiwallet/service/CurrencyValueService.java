@@ -28,7 +28,7 @@ public class CurrencyValueService {
         try {
             return currencyValueRepository.saveOrUpdateAll(currencyValues);
         } catch (SQLException e) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 }

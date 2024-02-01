@@ -72,4 +72,15 @@ public class CurrencyValue implements Serializable {
     public int hashCode() {
         return Objects.hash(id, effectiveDatetime, amount, source, destination);
     }
+
+    @Override
+    public String toString() {
+        return "CurrencyValue{" +
+                "id='" + id + '\'' +
+                ", effectiveDatetime=" + effectiveDatetime +
+                ", amount=" + amount +
+                ", source=" + source +
+                ", destination=" + destination +
+                '}';
+    }
 }

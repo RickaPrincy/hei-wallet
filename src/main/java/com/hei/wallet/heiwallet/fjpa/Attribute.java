@@ -7,12 +7,14 @@ public class Attribute {
     private String fieldName;
     private boolean required;
     private Class<?> fieldType;
+    private boolean isRelation;
 
-    public Attribute(String columnName, String fieldName, boolean required, Class<?> fieldType) {
+    public Attribute(String columnName, String fieldName, boolean required, Class<?> fieldType, boolean isRelation) {
         this.columnName = columnName;
         this.fieldName = fieldName;
         this.required = required;
         this.fieldType = fieldType;
+        this.isRelation = isRelation;
     }
 
     public String getColumnName() {
@@ -47,26 +49,24 @@ public class Attribute {
         this.fieldType = fieldType;
     }
 
+    public boolean isRelation() {
+        return isRelation;
+    }
+
+    public void setRelation(boolean relation) {
+        isRelation = relation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Attribute attribute = (Attribute) o;
-        return required == attribute.required && Objects.equals(columnName, attribute.columnName) && Objects.equals(fieldName, attribute.fieldName) && Objects.equals(fieldType, attribute.fieldType);
+        return required == attribute.required && isRelation == attribute.isRelation && Objects.equals(columnName, attribute.columnName) && Objects.equals(fieldName, attribute.fieldName) && Objects.equals(fieldType, attribute.fieldType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(columnName, fieldName, required, fieldType);
-    }
-
-    @Override
-    public String toString() {
-        return "Attribute{" +
-                "columnName='" + columnName + '\'' +
-                ", fieldName='" + fieldName + '\'' +
-                ", required=" + required +
-                ", fieldType=" + fieldType +
-                '}';
+        return Objects.hash(columnName, fieldName, required, fieldType, isRelation);
     }
 }
