@@ -20,6 +20,14 @@ public class CategoryService {
         }
     }
 
+    public List<Category> saveOrUpdateAll(List<Category> categories){
+        try {
+            return categoryRepository.saveOrUpdateAll(categories);
+        } catch (SQLException e) {
+            throw new InternalServerErrorException();
+        }
+    }
+
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
