@@ -12,7 +12,7 @@ public class BalanceController {
     private final BalanceService balanceService;
 
     @GetMapping("/balances")
-    public List<Balance> getAllBalances(){
+    public List<Balance> getAll(){
         return balanceService.getAll();
     }
 

@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleRuntimeException(ApiException error) {
         return new ResponseEntity<>(
                 new ApiErrorResponse(error.getMessage(), error.getStatus()),
-                error.getStatus()
+                HttpStatus.BAD_REQUEST
         );
     }
 
