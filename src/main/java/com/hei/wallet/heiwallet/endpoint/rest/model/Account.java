@@ -10,18 +10,14 @@ public class Account implements Serializable {
     private String name;
     private AccountType type;
     private Currency currency;
+    private Balance balance;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return Objects.equals(id, account.id) && Objects.equals(name, account.name) && type == account.type && Objects.equals(currency, account.currency);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, type, currency);
+    public Account(String id, String name, AccountType type, Currency currency, Balance balance) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.currency = currency;
+        this.balance = balance;
     }
 
     public String getId() {
@@ -56,10 +52,24 @@ public class Account implements Serializable {
         this.currency = currency;
     }
 
-    public Account(String id, String name, AccountType type, Currency currency) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.currency = currency;
+    public Balance getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Balance balance) {
+        this.balance = balance;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id) && Objects.equals(name, account.name) && type == account.type && Objects.equals(currency, account.currency) && Objects.equals(balance, account.balance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, type, currency, balance);
     }
 }

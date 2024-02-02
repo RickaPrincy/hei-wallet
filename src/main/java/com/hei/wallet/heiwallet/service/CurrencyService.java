@@ -28,6 +28,14 @@ public class CurrencyService {
         }
     }
 
+    public Currency findById(String id){
+        try {
+            return currencyRepository.findById(id);
+        } catch (SQLException e) {
+            throw new InternalServerErrorException();
+        }
+    }
+
     public CurrencyService(CurrencyRepository currencyRepository) {
         this.currencyRepository = currencyRepository;
     }

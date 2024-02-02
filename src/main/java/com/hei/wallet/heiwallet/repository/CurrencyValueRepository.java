@@ -1,6 +1,5 @@
 package com.hei.wallet.heiwallet.repository;
 
-import com.hei.wallet.heiwallet.exception.NotFoundException;
 import com.hei.wallet.heiwallet.fjpa.Attribute;
 import com.hei.wallet.heiwallet.fjpa.FJPARepository;
 import com.hei.wallet.heiwallet.fjpa.StatementWrapper;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Repository
 public class CurrencyValueRepository extends FJPARepository<CurrencyValue> {
@@ -17,17 +17,18 @@ public class CurrencyValueRepository extends FJPARepository<CurrencyValue> {
         super(CurrencyValue.class, statementWrapper);
     }
 
+    public List<CurrencyValue> findAllByCurrencyId(String currencyId) throws SQLException {
+        String query = selectAllQuery + " WHERE \"source\" = ? OR \"destination\" = ? ORDER BY \"effective_date\" DESC";
+        return statementWrapper.select(query, List.of(currencyId, currencyId), this::mapResultSetToInstance);
+    }
+
+    // start of configuration
     @Override
-    protected CurrencyValue mapResultSetToInstance(ResultSet resultSet) {
+    protected CurrencyValue mapResultSetToInstance(ResultSet resultSet, List<Class<?>> excludes) {
+        CurrencyValue currencyValue = super.mapResultSetToInstance(resultSet, excludes);
         try {
             CurrencyRepository currencyRepository = new CurrencyRepository(statementWrapper);
-            CurrencyValue currencyValue = super.mapResultSetToInstance(resultSet);
-            Currency source = currencyRepository.findByField(
-                    "id",
-                    resultSet.getString("source"),
-                    false
-            ).stream().findFirst().orElseThrow(NotFoundException::new);
-
+            Currency source = currencyRepository.findById(resultSet.getString("source"));
             Currency destination = currencyRepository.findById(resultSet.getString("destination"));
             currencyValue.setDestination(destination);
             currencyValue.setSource(source);

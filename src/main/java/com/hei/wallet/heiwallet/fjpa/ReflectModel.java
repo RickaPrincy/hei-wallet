@@ -1,5 +1,6 @@
 package com.hei.wallet.heiwallet.fjpa;
 
+import com.hei.wallet.heiwallet.exception.InternalServerErrorException;
 import com.hei.wallet.heiwallet.fjpa.annotation.Column;
 import com.hei.wallet.heiwallet.fjpa.annotation.Entity;
 import com.hei.wallet.heiwallet.fjpa.annotation.Id;
@@ -59,27 +60,8 @@ public class ReflectModel<T>{
         }
     }
 
-    protected T useCorrectMapper(ResultSet resultSet){
-        return useCorrectMapper(resultSet, true);
-    }
-
-    protected T useCorrectMapper(ResultSet resultSet, boolean fetchRelation) {
-        try {
-            if (!fetchRelation) {
-                Method mapperMethod = ReflectModel.class.getDeclaredMethod("mapResultSetToInstance", ResultSet.class);
-                return (T) mapperMethod.invoke(this, resultSet);
-            }
-            return mapResultSetToInstance(resultSet);
-        } catch (
-                NoSuchMethodException |
-                InvocationTargetException |
-                IllegalAccessException error
-        ) {
-            throw new RuntimeException(error.getMessage());
-        }
-    }
-
-    protected T mapResultSetToInstance(ResultSet resultSet) {
+    // To override for relation mapping
+    protected T mapResultSetToInstance(ResultSet resultSet, List<Class<?>> excludes) {
         Map<String, Object> values = new HashMap<>();
         for(Attribute attribute: getAttributes()){
             if(attribute.isRelation())
@@ -103,6 +85,10 @@ public class ReflectModel<T>{
         };
 
         return createInstance(values);
+    }
+
+    protected T mapResultSetToInstance(ResultSet resultSet) {
+        return mapResultSetToInstance(resultSet, List.of());
     }
 
     private T createInstance(Map<String, Object> argsValues) {

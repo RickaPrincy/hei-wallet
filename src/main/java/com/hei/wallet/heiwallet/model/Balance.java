@@ -26,6 +26,9 @@ public class Balance implements Serializable {
     @Relation
     private Account account;
 
+    public Balance() {
+    }
+
     public Balance(String id, BigDecimal amount, Instant creationDatetime, Account account) {
         this.id = id;
         this.amount = amount;
@@ -76,8 +79,5 @@ public class Balance implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, amount, creationDatetime, account);
-    }
-
-    public Balance() {
     }
 }

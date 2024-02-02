@@ -17,7 +17,8 @@ public class CurrencyMapper {
         return new com.hei.wallet.heiwallet.model.Currency(
                 currency.getId(),
                 currency.getName(),
-                currency.getCode()
+                currency.getCode(),
+                null
         );
     }
 

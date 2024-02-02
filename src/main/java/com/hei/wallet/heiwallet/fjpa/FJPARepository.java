@@ -18,23 +18,28 @@ public class FJPARepository <T> extends ReflectModel<T> implements BasicCrudOper
 
     @Override
     public List<T> findAll() throws SQLException {
-        return statementWrapper.select(selectAllQuery + " ;",null, this::useCorrectMapper);
+        return statementWrapper.select(selectAllQuery + " ;",null, this::mapResultSetToInstance);
     }
 
     public List<T> findByField(String fieldName, Object fieldValue) throws SQLException {
-        return findByField(fieldName, fieldValue, true);
+        return findByField(fieldName, fieldValue, List.of());
     }
 
-    public List<T> findByField(String fieldName, Object fieldValue, boolean fetchRelation) throws SQLException {
+    public List<T> findByField(String fieldName, Object fieldValue, List<Class<?>> excludes) throws SQLException {
         String query = selectAllQuery + " WHERE " + fieldName  + " = ? ;";
-        return statementWrapper.select(query,List.of(fieldValue), resultSet -> this.useCorrectMapper(resultSet, fetchRelation));
+        return statementWrapper.select(query,List.of(fieldValue), resultSet -> this.mapResultSetToInstance(resultSet, excludes));
     }
 
     @Override
     public T findById(Object id) throws SQLException {
-        List<T> lists = findByField(getIdAttribute().getFieldName(), id);
+        return findById(id, List.of());
+    }
+
+    public T findById(Object id, List<Class<?>> excludes) throws SQLException {
+        List<T> lists = findByField(getIdAttribute().getFieldName(), id, excludes);
         return lists.isEmpty() ? null : lists.get(0);
     }
+
 
     @Override
     public T saveOrUpdate(T toSave) throws SQLException {
@@ -73,7 +78,7 @@ public class FJPARepository <T> extends ReflectModel<T> implements BasicCrudOper
         ResultSet resultSet = statementWrapper.update(query, values);
         if(!resultSet.next())
             return null;
-        return useCorrectMapper(resultSet);
+        return mapResultSetToInstance(resultSet);
     }
 
     @Override

@@ -37,6 +37,8 @@ public class CurrencyValueMapper {
     }
 
     public CurrencyValue toRest(com.hei.wallet.heiwallet.model.CurrencyValue currencyValue){
+        if(currencyValue == null)
+            return null;
         return new CurrencyValue(
                 currencyValue.getId(),
                 currencyValue.getEffectiveDatetime(),
@@ -50,7 +52,8 @@ public class CurrencyValueMapper {
         return new com.hei.wallet.heiwallet.model.Currency(
                 currency.getId(),
                 currency.getName(),
-                currency.getCode()
+                currency.getCode(),
+                null
         );
     }
 

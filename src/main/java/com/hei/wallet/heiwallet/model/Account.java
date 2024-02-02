@@ -6,6 +6,7 @@ import com.hei.wallet.heiwallet.fjpa.annotation.Id;
 import com.hei.wallet.heiwallet.fjpa.annotation.Relation;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 @Entity(tableName = "account")
@@ -24,27 +25,17 @@ public class Account implements Serializable {
     @Relation
     private Currency currency;
 
+    private List<Balance> balances;
+
     public Account() {
     }
 
-    public Account(String id, String name, AccountType type, Currency currency) {
+    public Account(String id, String name, AccountType type, Currency currency, List<Balance> balances) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.currency = currency;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return Objects.equals(id, account.id) && Objects.equals(name, account.name) && type == account.type && Objects.equals(currency, account.currency);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, type, currency);
+        this.balances = balances;
     }
 
     public String getId() {
@@ -77,5 +68,26 @@ public class Account implements Serializable {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public List<Balance> getBalances() {
+        return balances;
+    }
+
+    public void setBalances(List<Balance> balances) {
+        this.balances = balances;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id) && Objects.equals(name, account.name) && type == account.type && Objects.equals(currency, account.currency) && Objects.equals(balances, account.balances);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, type, currency, balances);
     }
 }
