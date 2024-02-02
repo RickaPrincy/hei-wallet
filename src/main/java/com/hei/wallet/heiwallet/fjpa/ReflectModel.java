@@ -59,6 +59,26 @@ public class ReflectModel<T>{
         }
     }
 
+    protected T useCorrectMapper(ResultSet resultSet){
+        return useCorrectMapper(resultSet, true);
+    }
+
+    protected T useCorrectMapper(ResultSet resultSet, boolean fetchRelation) {
+        try {
+            if (!fetchRelation) {
+                Method mapperMethod = ReflectModel.class.getDeclaredMethod("mapResultSetToInstance", ResultSet.class);
+                return (T) mapperMethod.invoke(this, resultSet);
+            }
+            return mapResultSetToInstance(resultSet);
+        } catch (
+                NoSuchMethodException |
+                InvocationTargetException |
+                IllegalAccessException error
+        ) {
+            throw new RuntimeException(error.getMessage());
+        }
+    }
+
     protected T mapResultSetToInstance(ResultSet resultSet) {
         Map<String, Object> values = new HashMap<>();
         for(Attribute attribute: getAttributes()){

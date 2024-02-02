@@ -3,6 +3,7 @@ package com.hei.wallet.heiwallet.model;
 import com.hei.wallet.heiwallet.fjpa.annotation.Column;
 import com.hei.wallet.heiwallet.fjpa.annotation.Entity;
 import com.hei.wallet.heiwallet.fjpa.annotation.Id;
+import com.hei.wallet.heiwallet.fjpa.annotation.Relation;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,49 +22,47 @@ public class Balance implements Serializable {
     @Column(columnName = "creation_datetime")
     private Instant creationDatetime;
 
-    @Column(columnName = "account")
-    private String accountId;
+    @Column
+    @Relation
+    private Account account;
 
-    public Balance(String id, BigDecimal amount, Instant creationDatetime, String accountId) {
+    public Balance(String id, BigDecimal amount, Instant creationDatetime, Account account) {
         this.id = id;
         this.amount = amount;
         this.creationDatetime = creationDatetime;
-        this.accountId = accountId;
-    }
-
-    public Balance() {
+        this.account = account;
     }
 
     public String getId() {
         return id;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public Instant getCreationDatetime() {
-        return creationDatetime;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
     public void setId(String id) {
         this.id = id;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
+    public Instant getCreationDatetime() {
+        return creationDatetime;
+    }
+
     public void setCreationDatetime(Instant creationDatetime) {
         this.creationDatetime = creationDatetime;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     @Override
@@ -71,11 +70,11 @@ public class Balance implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Balance balance = (Balance) o;
-        return Objects.equals(id, balance.id) && Objects.equals(amount, balance.amount) && Objects.equals(creationDatetime, balance.creationDatetime) && Objects.equals(accountId, balance.accountId);
+        return Objects.equals(id, balance.id) && Objects.equals(amount, balance.amount) && Objects.equals(creationDatetime, balance.creationDatetime) && Objects.equals(account, balance.account);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, amount, creationDatetime, accountId);
+        return Objects.hash(id, amount, creationDatetime, account);
     }
 }

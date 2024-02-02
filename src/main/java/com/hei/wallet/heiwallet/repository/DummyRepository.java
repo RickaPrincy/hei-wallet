@@ -5,6 +5,8 @@ import com.hei.wallet.heiwallet.fjpa.StatementWrapper;
 import com.hei.wallet.heiwallet.model.Dummy;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+
 @Repository
 public class DummyRepository extends FJPARepository<Dummy> {
     public DummyRepository(StatementWrapper statementWrapper) {

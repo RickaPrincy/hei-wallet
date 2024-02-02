@@ -18,12 +18,16 @@ public class FJPARepository <T> extends ReflectModel<T> implements BasicCrudOper
 
     @Override
     public List<T> findAll() throws SQLException {
-        return statementWrapper.select(selectAllQuery + " ;",null, this::mapResultSetToInstance);
+        return statementWrapper.select(selectAllQuery + " ;",null, this::useCorrectMapper);
     }
 
     public List<T> findByField(String fieldName, Object fieldValue) throws SQLException {
+        return findByField(fieldName, fieldValue, true);
+    }
+
+    public List<T> findByField(String fieldName, Object fieldValue, boolean fetchRelation) throws SQLException {
         String query = selectAllQuery + " WHERE " + fieldName  + " = ? ;";
-        return statementWrapper.select(query,List.of(fieldValue), this::mapResultSetToInstance);
+        return statementWrapper.select(query,List.of(fieldValue), resultSet -> this.useCorrectMapper(resultSet, fetchRelation));
     }
 
     @Override
@@ -69,7 +73,7 @@ public class FJPARepository <T> extends ReflectModel<T> implements BasicCrudOper
         ResultSet resultSet = statementWrapper.update(query, values);
         if(!resultSet.next())
             return null;
-        return mapResultSetToInstance(resultSet);
+        return useCorrectMapper(resultSet);
     }
 
     @Override

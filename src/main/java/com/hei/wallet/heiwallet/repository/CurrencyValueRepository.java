@@ -1,5 +1,6 @@
 package com.hei.wallet.heiwallet.repository;
 
+import com.hei.wallet.heiwallet.exception.NotFoundException;
 import com.hei.wallet.heiwallet.fjpa.Attribute;
 import com.hei.wallet.heiwallet.fjpa.FJPARepository;
 import com.hei.wallet.heiwallet.fjpa.StatementWrapper;
@@ -12,21 +13,21 @@ import java.sql.SQLException;
 
 @Repository
 public class CurrencyValueRepository extends FJPARepository<CurrencyValue> {
-    private final CurrencyRepository currencyRepository;
-
-    public CurrencyValueRepository(
-            StatementWrapper statementWrapper,
-            CurrencyRepository currencyRepository
-    ) {
+    public CurrencyValueRepository(StatementWrapper statementWrapper) {
         super(CurrencyValue.class, statementWrapper);
-        this.currencyRepository = currencyRepository;
     }
 
     @Override
     protected CurrencyValue mapResultSetToInstance(ResultSet resultSet) {
         try {
+            CurrencyRepository currencyRepository = new CurrencyRepository(statementWrapper);
             CurrencyValue currencyValue = super.mapResultSetToInstance(resultSet);
-            Currency source = currencyRepository.findById(resultSet.getString("source"));
+            Currency source = currencyRepository.findByField(
+                    "id",
+                    resultSet.getString("source"),
+                    false
+            ).stream().findFirst().orElseThrow(NotFoundException::new);
+
             Currency destination = currencyRepository.findById(resultSet.getString("destination"));
             currencyValue.setDestination(destination);
             currencyValue.setSource(source);
