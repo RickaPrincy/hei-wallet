@@ -24,6 +24,9 @@ public class Account implements Serializable {
     @Relation
     private Currency currency;
 
+    public Account() {
+    }
+
     public Account(String id, String name, AccountType type, Currency currency) {
         this.id = id;
         this.name = name;

@@ -77,4 +77,7 @@ public class Balance implements Serializable {
     public int hashCode() {
         return Objects.hash(id, amount, creationDatetime, account);
     }
+
+    public Balance() {
+    }
 }

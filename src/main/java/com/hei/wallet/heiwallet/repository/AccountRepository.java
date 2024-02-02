@@ -36,6 +36,7 @@ public class AccountRepository extends FJPARepository<Account> {
         try {
             Account account = super.mapResultSetToInstance(resultSet);
             Currency currency = currencyRepository.findByField(
+                    "id",
                     resultSet.getString("currency"),
                     false
             ).stream().findFirst().orElseThrow(InternalServerErrorException::new);
