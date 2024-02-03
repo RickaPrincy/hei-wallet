@@ -26,3 +26,11 @@ WHERE NOT EXISTS (
     WHERE
         "id"='category_3' AND "name"='Multimedia'
 );
+
+INSERT INTO "category"
+SELECT 'category_transfer', 'TRANSFER', 'ALL'
+WHERE NOT EXISTS (
+    SELECT 1 FROM "category"
+    WHERE
+        "id"='category_transfer' AND "name"='TRANSFER'
+);

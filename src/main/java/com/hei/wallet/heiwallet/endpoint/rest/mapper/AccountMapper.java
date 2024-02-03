@@ -49,6 +49,21 @@ public class AccountMapper {
         );
     }
 
+    public com.hei.wallet.heiwallet.model.Account toDomain(Account account){
+        final List<com.hei.wallet.heiwallet.model.Balance> balance = balanceService.findAllByAccountId(account.getId(),null,null);
+        final com.hei.wallet.heiwallet.model.Currency currency = currencyService.findById(account.getCurrency().getId());
+        final List<com.hei.wallet.heiwallet.model.Transaction> transactions = transactionService.findAllByAccountId(account.getId());
+
+        return new com.hei.wallet.heiwallet.model.Account(
+                account.getId(),
+                account.getName(),
+                account.getType(),
+                currency,
+                balance,
+                transactions
+        );
+    }
+
     public AccountMapper(
             CurrencyMapper currencyMapper,
             BalanceMapper balanceMapper, TransactionMapper transactionMapper,

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "transaction" (
     "transaction_datetime" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "type" "transaction_type" NOT NULL,
     "label" VARCHAR(255) NOT NULL,
-    "amount" DECIMAL(18,5) NOT NULL CHECK("amount" > 0),
+    "amount" DECIMAL(18,5) NOT NULL,
     "account" VARCHAR(255) REFERENCES "account"("id") NOT NULL
 );
 
