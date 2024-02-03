@@ -29,6 +29,14 @@ public class BalanceService {
         }
     }
 
+    public List<Balance> crupdateAll(List<Balance> balances) {
+        try {
+            return balanceRepository.saveOrUpdateAll(balances);
+        } catch (SQLException error) {
+            throw new InternalServerErrorException(error.getMessage());
+        }
+    }
+
     public BalanceService(BalanceRepository balanceRepository) {
         this.balanceRepository = balanceRepository;
     }
