@@ -46,14 +46,19 @@ public class TransactionService {
         currentBalance.setCreationDatetime(transaction.getTransactionDatetime());
         BigDecimal newAmount;
 
-        if(transaction.getType() == TransactionType.CREDIT){
-            if(transaction.getCategory().getType() == CategoryType.CREDIT)
-                throw new BadRequestException("Category not available for the transaction type");
+        if(
+            (
+                transaction.getType() == TransactionType.CREDIT &&
+                transaction.getCategory().getType() != CategoryType.DEBIT
+            ) ||
+            (
+                transaction.getType() == TransactionType.DEBIT &&
+                transaction.getCategory().getType() != CategoryType.CREDIT
+            )
+        ){
             newAmount = currentBalance.getAmount().add(transaction.getAmount());
         }else{
-            if(transaction.getCategory().getType() == CategoryType.DEBIT)
-                throw new BadRequestException("Category not available for the transaction type");
-            newAmount = currentBalance.getAmount().subtract(transaction.getAmount());
+            throw new BadRequestException("Category not available for the transaction type");
         }
 
         currentBalance.setAmount(newAmount);

@@ -20,7 +20,7 @@ public class AccountMapper {
 
     public com.hei.wallet.heiwallet.model.Account createToDomain(CreateAccount account){
         final com.hei.wallet.heiwallet.model.Currency currency = currencyService.findById(account.getCurrencyId());
-        final List<com.hei.wallet.heiwallet.model.Balance> balances = balanceService.findAllByAccountId(account.getId());
+        final List<com.hei.wallet.heiwallet.model.Balance> balances = balanceService.findAllByAccountId(account.getId(),null,null);
         final List<com.hei.wallet.heiwallet.model.Transaction> transactions = transactionService.findAllByAccountId(account.getId());
 
         if(currency == null){
