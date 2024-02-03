@@ -7,10 +7,12 @@ import com.hei.wallet.heiwallet.fjpa.StatementWrapper;
 import com.hei.wallet.heiwallet.model.Account;
 import com.hei.wallet.heiwallet.model.Balance;
 import com.hei.wallet.heiwallet.model.Currency;
+import com.hei.wallet.heiwallet.model.Transaction;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -39,15 +41,26 @@ public class AccountRepository extends FJPARepository<Account> {
             account.setCurrency(currency);
 
             // relation with balance
-            if(excludes.contains(Balance.class))
-                return account;
-            BalanceRepository balanceRepository = new BalanceRepository(statementWrapper);
-            List<Balance> balances = balanceRepository.findByField(
-                    "account",
-                    account.getId(),
-                    List.of(Account.class)
-            );
-            account.setBalances(balances);
+            if(!excludes.contains(Balance.class)){
+                BalanceRepository balanceRepository = new BalanceRepository(statementWrapper);
+                List<Balance> balances = balanceRepository.findByField(
+                        "account",
+                        account.getId(),
+                        List.of(Account.class)
+                );
+                account.setBalances(balances);
+            }
+
+            // relation with transaction
+            if(!excludes.contains(Transaction.class)){
+                TransactionRepository transactionRepository = new TransactionRepository(statementWrapper);
+                List<Transaction> transactions = transactionRepository.findByField(
+                        "account",
+                        account.getId(),
+                        List.of(Account.class)
+                );
+                account.setTransactions(transactions);
+            }
 
             return account;
         } catch (SQLException e) {

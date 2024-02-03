@@ -31,4 +31,12 @@ public class AccountService {
             throw new InternalServerErrorException(e.getMessage());
         }
     }
+
+    public Account findById(String accountId) {
+        try {
+            return accountRepository.findById(accountId);
+        } catch (SQLException e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
 }

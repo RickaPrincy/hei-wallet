@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 public class BalanceMapper {
 
     public Balance toRest(com.hei.wallet.heiwallet.model.Balance balance){
-        if(balance == null)
-            return null;
         return new Balance(
             balance.getId(),
             balance.getCreationDatetime(),

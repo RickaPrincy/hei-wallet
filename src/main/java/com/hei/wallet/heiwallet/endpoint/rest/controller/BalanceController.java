@@ -2,6 +2,7 @@ package com.hei.wallet.heiwallet.endpoint.rest.controller;
 
 import com.hei.wallet.heiwallet.endpoint.rest.mapper.BalanceMapper;
 import com.hei.wallet.heiwallet.endpoint.rest.model.Balance;
+import com.hei.wallet.heiwallet.exception.NotFoundException;
 import com.hei.wallet.heiwallet.service.BalanceService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +27,7 @@ public class BalanceController {
     public Balance getAccountCurrentBalance(@PathVariable String accountId){
         return balanceMapper.toRest(
                 balanceService.findCurrentBalanceByAccountId(accountId)
-                .orElse(null)
+                .orElseThrow(NotFoundException::new)
         );
     }
 

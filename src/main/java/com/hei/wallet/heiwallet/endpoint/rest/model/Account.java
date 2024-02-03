@@ -3,6 +3,7 @@ package com.hei.wallet.heiwallet.endpoint.rest.model;
 import com.hei.wallet.heiwallet.model.AccountType;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 public class Account implements Serializable {
@@ -11,13 +12,23 @@ public class Account implements Serializable {
     private AccountType type;
     private Currency currency;
     private Balance balance;
+    private List<Transaction> transactions;
 
-    public Account(String id, String name, AccountType type, Currency currency, Balance balance) {
+    public Account(String id, String name, AccountType type, Currency currency, Balance balance, List<Transaction> transactions) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.currency = currency;
         this.balance = balance;
+        this.transactions = transactions;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 
     public String getId() {

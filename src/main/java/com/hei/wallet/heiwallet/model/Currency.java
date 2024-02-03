@@ -18,17 +18,13 @@ public class Currency implements Serializable {
     @Column
     private String code;
 
-    @Relation
-    private List<CurrencyValue> currencyValues;
-
     public Currency() {
     }
 
-    public Currency(String id, String name, String code, List<CurrencyValue> currencyValues) {
+    public Currency(String id, String name, String code) {
         this.id = id;
         this.name = name;
         this.code = code;
-        this.currencyValues = currencyValues;
     }
 
     public String getId() {
@@ -55,24 +51,16 @@ public class Currency implements Serializable {
         this.code = code;
     }
 
-    public List<CurrencyValue> getCurrencyValues() {
-        return currencyValues;
-    }
-
-    public void setCurrencyValues(List<CurrencyValue> currencyValues) {
-        this.currencyValues = currencyValues;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Currency currency = (Currency) o;
-        return Objects.equals(id, currency.id) && Objects.equals(name, currency.name) && Objects.equals(code, currency.code) && Objects.equals(currencyValues, currency.currencyValues);
+        return Objects.equals(id, currency.id) && Objects.equals(name, currency.name) && Objects.equals(code, currency.code);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, code, currencyValues);
+        return Objects.hash(id, name, code);
     }
 }
