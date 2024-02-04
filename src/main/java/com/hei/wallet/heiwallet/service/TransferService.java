@@ -2,12 +2,14 @@ package com.hei.wallet.heiwallet.service;
 
 import com.hei.wallet.heiwallet.exception.BadRequestException;
 import com.hei.wallet.heiwallet.exception.InternalServerErrorException;
+import com.hei.wallet.heiwallet.model.Account;
 import com.hei.wallet.heiwallet.model.Transaction;
 import com.hei.wallet.heiwallet.model.TransactionType;
 import com.hei.wallet.heiwallet.model.Transfer;
 import com.hei.wallet.heiwallet.repository.TransferRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
@@ -18,6 +20,8 @@ public class TransferService {
     private final TransferRepository transferRepository;
     private final TransactionService transactionService;
     private final CategoryService categoryService;
+    private final CurrencyValueService currencyValueService;
+
     private final static String TRANSFER_LABEL="TRANSFER";
     private final static String CATEGORY_ID_FOR_TRANSFER="category_transfer";
 
@@ -26,6 +30,18 @@ public class TransferService {
             throw new BadRequestException("Cannot make a transfer to the account's it self");
         }
         final Instant CURRENT_DATETIME = Instant.now();
+        Account sourceAccount = transfer.getSource();
+        Account destinationAccount = transfer.getDestination();
+        BigDecimal destinationAmount = transfer.getAmount();
+
+        // if currency are different
+        if(!sourceAccount.getCurrency().getId().equals(destinationAccount.getCurrency().getId())){
+            destinationAmount = currencyValueService.getConvertedCurrencyValue(
+                    sourceAccount.getCurrency().getId(),
+                    destinationAccount.getCurrency().getId()
+            ).getAmount();
+        }
+
         Transaction sourceTransaction = new Transaction(
             UUID.randomUUID().toString(),
             TRANSFER_LABEL,
@@ -39,7 +55,7 @@ public class TransferService {
         Transaction destinationTransaction = new Transaction(
             UUID.randomUUID().toString(),
             TRANSFER_LABEL,
-            transfer.getAmount(),
+            destinationAmount,
             CURRENT_DATETIME,
             TransactionType.CREDIT,
             categoryService.findById(CATEGORY_ID_FOR_TRANSFER),
@@ -48,8 +64,8 @@ public class TransferService {
 
         transactionService.doTransaction(sourceTransaction);
         transactionService.doTransaction(destinationTransaction);
-        saveOrUpdateAll(List.of(transfer));
-        return findById(transfer.getId());
+        this.saveOrUpdateAll(List.of(transfer));
+        return this.findById(transfer.getId());
     }
     public List<Transfer> findAll(Instant from, Instant to) {
         try {
@@ -82,10 +98,10 @@ public class TransferService {
         }
     }
 
-    public TransferService(TransferRepository transferRepository, TransactionService transactionService, CategoryService categoryService) {
+    public TransferService(TransferRepository transferRepository, TransactionService transactionService, CategoryService categoryService, CurrencyValueService currencyValueService) {
         this.transferRepository = transferRepository;
         this.transactionService = transactionService;
         this.categoryService = categoryService;
+        this.currencyValueService = currencyValueService;
     }
-
 }

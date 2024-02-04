@@ -17,6 +17,13 @@ public class CurrencyValueService {
         this.currencyValueRepository = currencyValueRepository;
     }
 
+    public CurrencyValue getConvertedCurrencyValue(String sourceId, String destinationId){
+        try {
+            return currencyValueRepository.findCurrencyLastValue(sourceId, destinationId);
+        } catch (SQLException e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
     public List<CurrencyValue> saveOrUpdateAll(List<CurrencyValue> currencyValues) {
         try {
             return currencyValueRepository.saveOrUpdateAll(currencyValues);

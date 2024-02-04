@@ -17,6 +17,12 @@ public class CurrencyValueRepository extends FJPARepository<CurrencyValue> {
         super(CurrencyValue.class, statementWrapper);
     }
 
+    public CurrencyValue findCurrencyLastValue(String sourceId, String destinationId) throws SQLException {
+        String query = selectAllQuery + " WHERE \"source\" = ? AND \"destination\" = ? ORDER BY \"effective_date\" DESC";
+        List<CurrencyValue> currencyValues = statementWrapper.select(query, List.of(sourceId, destinationId), this::mapResultSetToInstance);
+        return currencyValues.isEmpty() ? null : currencyValues.get(0);
+    }
+
     public List<CurrencyValue> findAllByCurrencyId(String currencyId) throws SQLException {
         String query = selectAllQuery + " WHERE \"source\" = ? OR \"destination\" = ? ORDER BY \"effective_date\" DESC";
         return statementWrapper.select(query, List.of(currencyId, currencyId), this::mapResultSetToInstance);
