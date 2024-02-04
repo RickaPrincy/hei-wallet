@@ -34,7 +34,7 @@ public class TransactionRepository extends FJPARepository<Transaction> {
 
         try {
             // category relation
-            CategoryRepository categoryRepository = new CategoryRepository(statementWrapper);
+            CategoryRepository categoryRepository = new CategoryRepository(statementWrapper, null);
             Category category = categoryRepository.findById(resultSet.getString("category"));
             transaction.setCategory(category);
 
